@@ -7,7 +7,9 @@
     "useDefineForClassFields": false,
     "strict": true,
     "declaration": false,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "noEmit": true
   },
   "include": ["src/**/*", "tests/**/*"]
 }
