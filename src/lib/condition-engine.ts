@@ -1,6 +1,6 @@
 import type { Condition, ConditionRule, StyleEffect } from '../types';
 
-interface HassLike {
+export interface HassLike {
   states: Record<string, { state: string; attributes: Record<string, unknown> }>;
 }
 
@@ -30,10 +30,17 @@ function evaluateCondition(condition: Condition, hass: HassLike): boolean {
   }
 }
 
+/**
+ * Evaluates an ordered list of ConditionRules against live HA state.
+ * Rules are evaluated top-to-bottom; later matching rules overwrite conflicting effect keys.
+ * The `contains` operator is case-sensitive.
+ */
 export function evaluateConditions(rules: ConditionRule[], hass: HassLike): StyleEffect {
   let result: StyleEffect = {};
 
   for (const rule of rules) {
+    if (rule.conditions.length === 0) continue;
+
     const matches = rule.operator === 'or'
       ? rule.conditions.some(c => evaluateCondition(c, hass))
       : rule.conditions.every(c => evaluateCondition(c, hass));

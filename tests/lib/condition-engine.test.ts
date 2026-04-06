@@ -193,4 +193,14 @@ describe('evaluateConditions', () => {
     }];
     expect(evaluateConditions(rules, mockHass)).toEqual({});
   });
+
+  it('and rule with empty conditions does not fire (guard against vacuous truth)', () => {
+    const rules: ConditionRule[] = [{
+      id: '1',
+      operator: 'and',
+      conditions: [],
+      effect: { background_color: '#ff0000' },
+    }];
+    expect(evaluateConditions(rules, mockHass)).toEqual({});
+  });
 });
