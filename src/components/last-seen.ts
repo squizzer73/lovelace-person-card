@@ -27,6 +27,16 @@ export class LastSeen extends LitElement {
     if (this._interval) clearInterval(this._interval);
   }
 
+  updated(changedProps: Map<string, unknown>) {
+    if (changedProps.has('format')) {
+      if (this._interval) clearInterval(this._interval);
+      this._interval = undefined;
+      if (this.format === 'relative') {
+        this._interval = setInterval(() => { this._tick++; }, 60_000);
+      }
+    }
+  }
+
   render() {
     if (!this.lastUpdated) return html``;
     void this._tick;

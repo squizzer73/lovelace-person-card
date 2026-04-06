@@ -31,7 +31,7 @@ export class LocationBadge extends LitElement {
     if (style?.label) return style.label;
     if (this.zone === 'not_home') return 'Away';
     if (this.zone === 'unknown') return 'Unknown';
-    return this.zone;
+    return this.zone.replace(/_/g, ' ');
   }
 
   private get icon(): string {

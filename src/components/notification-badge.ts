@@ -1,5 +1,6 @@
 import { LitElement, html, css } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
+import { styleMap } from 'lit/directives/style-map.js';
 
 @customElement('person-card-notification-badge')
 export class NotificationBadge extends LitElement {
@@ -11,25 +12,23 @@ export class NotificationBadge extends LitElement {
       display: inline-flex;
       align-items: center;
       justify-content: center;
+      flex-shrink: 0;
+    }
+    .badge {
       width: 22px;
       height: 22px;
       border-radius: 50%;
-      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--badge-bg, #f44336);
+      box-shadow: 0 0 8px var(--badge-bg, #f44336);
     }
   `;
 
   render() {
     return html`
-      <div style="
-        background:${this.color};
-        border-radius:50%;
-        width:22px;
-        height:22px;
-        display:flex;
-        align-items:center;
-        justify-content:center;
-        box-shadow:0 0 8px ${this.color}88;
-      ">
+      <div class="badge" style=${styleMap({ '--badge-bg': this.color } as Record<string, string>)}>
         <ha-icon .icon=${this.icon} style="color:#fff;--mdc-icon-size:14px"></ha-icon>
       </div>
     `;

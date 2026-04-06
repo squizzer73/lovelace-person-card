@@ -25,7 +25,7 @@ export class EtaDisplay extends LitElement {
     const display = minutes < 1 ? 'arriving' : `${Math.round(minutes)} min`;
 
     return html`
-      <ha-icon icon="mdi:clock-outline"></ha-icon>
+      <ha-icon .icon=${'mdi:clock-outline'}></ha-icon>
       <span>ETA home: ${display}</span>
     `;
   }

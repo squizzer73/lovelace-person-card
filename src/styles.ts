@@ -62,6 +62,16 @@ export const cardStyles = css`
     height: 64px;
   }
 
+  :host([size-tier='small']) .avatar-placeholder {
+    width: 36px;
+    height: 36px;
+  }
+
+  :host([size-tier='large']) .avatar-placeholder {
+    width: 64px;
+    height: 64px;
+  }
+
   .avatar-placeholder {
     width: var(--person-card-avatar-size, 48px);
     height: var(--person-card-avatar-size, 48px);

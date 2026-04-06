@@ -67,6 +67,7 @@ export class DeviceTile extends LitElement {
   }
 
   render() {
+    if (!this.hass || !this.device) return html``;
     const battery = getBatteryLevel(this.hass, this.device);
     const conn: ConnectivityState = getConnectivity(this.hass, this.device);
     const icon = this.device.icon ?? 'mdi:cellphone';
