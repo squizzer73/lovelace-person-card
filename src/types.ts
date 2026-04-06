@@ -3,7 +3,7 @@ export interface PersonCardConfig {
   name?: string;
   photo?: string;
   devices?: DeviceConfig[];
-  size?: 'auto' | 'small' | 'medium' | 'large';
+  size?: SizeConfig;
   show_eta?: boolean;
   show_last_seen?: boolean;
   show_notification_badge?: boolean;
@@ -30,6 +30,7 @@ export interface ZoneStyleConfig {
 }
 
 export interface ConditionRule {
+  /** UUID generated on creation — use crypto.randomUUID() */
   id: string;
   label?: string;
   operator: 'and' | 'or';
@@ -41,6 +42,7 @@ export interface Condition {
   entity: string;
   attribute?: string;
   operator: 'eq' | 'neq' | 'lt' | 'gt' | 'lte' | 'gte' | 'contains';
+  /** number when operator is lt|gt|lte|gte; string when operator is contains; either for eq|neq */
   value: string | number;
 }
 
@@ -52,6 +54,10 @@ export interface StyleEffect {
   badge_icon?: string;
 }
 
+/** Resolved display tier — never 'auto'. Use SizeConfig for the config field. */
 export type SizeTier = 'small' | 'medium' | 'large';
+
+/** Config value for size — includes 'auto' which resolves via ResizeObserver. */
+export type SizeConfig = 'auto' | SizeTier;
 
 export type ConnectivityState = 'online' | 'offline' | 'unknown';
