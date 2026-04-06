@@ -177,8 +177,14 @@ export class PersonCardEditor extends LitElement {
   }
 
   private _addDevice() {
-    const devices = [...(this._config.devices ?? []), { entity: '' }];
-    this._set({ devices });
+    const all = [...(this._config.devices ?? [])];
+    const etaIndex = all.findIndex(d => d.name === '__eta__');
+    if (etaIndex === -1) {
+      all.push({ entity: '' });
+    } else {
+      all.splice(etaIndex, 0, { entity: '' });
+    }
+    this._set({ devices: all });
   }
 
   // ── Tab: Appearance ───────────────────────────────────────────────────────────
@@ -314,7 +320,13 @@ export class PersonCardEditor extends LitElement {
               `)}
             </select>
             <ha-textfield .value=${String(cond.value)} label="Value"
-              @input=${(e: InputEvent) => this._updateCondition(ri, ci, { value: (e.target as HTMLInputElement).value })}
+              @input=${(e: InputEvent) => {
+                const raw = (e.target as HTMLInputElement).value;
+                const numericOps: Condition['operator'][] = ['lt', 'gt', 'lte', 'gte'];
+                const numVal = parseFloat(raw);
+                const value = numericOps.includes(cond.operator) && !isNaN(numVal) ? numVal : raw;
+                this._updateCondition(ri, ci, { value });
+              }}
             ></ha-textfield>
             <button class="delete-btn" @click=${() => this._removeCondition(ri, ci)}>
               <ha-icon .icon=${'mdi:close'}></ha-icon>
@@ -352,15 +364,15 @@ export class PersonCardEditor extends LitElement {
   }
 
   private _updateRule(index: number, patch: Partial<ConditionRule>) {
-    const conditions = [...(this._config.conditions ?? [])];
-    conditions[index] = { ...conditions[index], ...patch };
-    this._set({ conditions });
+    const rules = [...(this._config.conditions ?? [])];
+    rules[index] = { ...rules[index], ...patch };
+    this._set({ conditions: rules });
   }
 
   private _removeRule(index: number) {
-    const conditions = [...(this._config.conditions ?? [])];
-    conditions.splice(index, 1);
-    this._set({ conditions });
+    const rules = [...(this._config.conditions ?? [])];
+    rules.splice(index, 1);
+    this._set({ conditions: rules });
   }
 
   private _addRule() {
