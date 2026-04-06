@@ -24,6 +24,9 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: Verify build output
+        run: test -f dist/person-card.js
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
