@@ -7,7 +7,7 @@ export const cardStyles = css`
     border-radius: var(--person-card-border-radius, 16px);
     overflow: hidden;
     position: relative;
-    background: var(--person-card-background, #1c1c2e);
+    background: var(--pc-background, #1c1c2e);
     color: #ffffff;
     box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
     transition: background 0.4s ease, border-color 0.4s ease, box-shadow 0.3s ease;

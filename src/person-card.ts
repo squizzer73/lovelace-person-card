@@ -2,7 +2,7 @@ import { LitElement, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
 import type { HomeAssistant } from 'custom-card-helpers';
-import type { PersonCardConfig, SizeTier, StyleEffect } from './types';
+import type { PersonCardConfig, SizeTier, StyleEffect, ZoneStyleConfig } from './types';
 import { cardStyles } from './styles';
 import { evaluateConditions } from './lib/condition-engine';
 import { shouldShowNotificationBadge } from './lib/ha-helpers';
@@ -33,7 +33,7 @@ window.customCards.push({
 export class PersonCard extends LitElement {
   @property({ attribute: false }) hass!: HomeAssistant;
   @state() private _config!: PersonCardConfig;
-  @state() private _sizeTier: SizeTier = 'medium';
+  private _sizeTier: SizeTier = 'medium';
 
   private _resizeObserver?: ResizeObserver;
 
@@ -66,6 +66,7 @@ export class PersonCard extends LitElement {
       conditions: [],
       ...config,
     };
+    if (this.isConnected) this._setupResizeObserver();
   }
 
   getCardSize(): number {
@@ -78,20 +79,33 @@ export class PersonCard extends LitElement {
 
   connectedCallback() {
     super.connectedCallback();
-    if (this._config?.size === 'auto') {
-      this._resizeObserver = new ResizeObserver(entries => {
-        const width = entries[0]?.contentRect.width ?? 300;
-        this._sizeTier = width < 200 ? 'small' : width < 400 ? 'medium' : 'large';
-      });
-      this._resizeObserver.observe(this);
-    } else if (this._config?.size) {
-      this._sizeTier = this._config.size;
-    }
+    if (this._config) this._setupResizeObserver();
   }
 
   disconnectedCallback() {
     super.disconnectedCallback();
     this._resizeObserver?.disconnect();
+  }
+
+  private _setSizeTier(tier: SizeTier) {
+    if (this._sizeTier === tier) return;
+    this._sizeTier = tier;
+    this.setAttribute('size-tier', tier);
+    this.requestUpdate();
+  }
+
+  private _setupResizeObserver(): void {
+    this._resizeObserver?.disconnect();
+    this._resizeObserver = undefined;
+    if (this._config.size === 'auto') {
+      this._resizeObserver = new ResizeObserver(entries => {
+        const width = entries[0]?.contentRect.width ?? 300;
+        this._setSizeTier(width < 200 ? 'small' : width < 400 ? 'medium' : 'large');
+      });
+      this._resizeObserver.observe(this);
+    } else if (this._config.size) {
+      this._setSizeTier(this._config.size);
+    }
   }
 
   private get _personState() {
@@ -102,33 +116,11 @@ export class PersonCard extends LitElement {
     return this._personState?.state ?? 'unknown';
   }
 
-  private get _conditionEffect(): StyleEffect {
-    if (!this._config.conditions?.length) return {};
-    return evaluateConditions(this._config.conditions, this.hass);
-  }
-
-  private get _zoneStyle() {
-    return this._config.zone_styles?.find(s => s.zone === this._personZone);
-  }
-
-  private get _showBadge(): boolean {
-    if (!this._config.show_notification_badge) return false;
-    const effect = this._conditionEffect;
-    if (effect.badge_color || effect.badge_icon) return true;
-    return shouldShowNotificationBadge(
-      this.hass,
-      this._config.devices ?? [],
-      this._config.person_entity,
-    );
-  }
-
-  private _hostStyles(): Record<string, string> {
-    const effect = this._conditionEffect;
-    const zoneStyle = this._zoneStyle;
+  private _hostStyles(effect: StyleEffect, zoneStyle: ZoneStyleConfig | undefined): Record<string, string> {
     const styles: Record<string, string> = {};
 
     const bg = effect.background_color ?? zoneStyle?.background_color;
-    if (bg) styles['--person-card-background'] = bg;
+    if (bg) styles['--pc-background'] = bg;
 
     const borderColor = effect.border_color ?? zoneStyle?.border_color;
     if (borderColor) {
@@ -152,15 +144,29 @@ export class PersonCard extends LitElement {
       ?? this._config.person_entity.split('.')[1].replace(/_/g, ' ');
     const photo = this._config.photo
       ?? (personState?.attributes?.['entity_picture'] as string | undefined);
-    const effect = this._conditionEffect;
+
+    const effect: StyleEffect = this._config.conditions?.length
+      ? evaluateConditions(this._config.conditions, this.hass)
+      : {};
+
+    const zoneStyle = this._config.zone_styles?.find(s => s.zone === this._personZone);
+
+    const showBadge = this._config.show_notification_badge !== false
+      && (effect.badge_color || effect.badge_icon
+        ? true
+        : shouldShowNotificationBadge(this.hass, this._config.devices ?? [], this._config.person_entity));
+
     const isLarge = this._sizeTier === 'large';
     const isSmall = this._sizeTier === 'small';
     const devices = this._config.devices ?? [];
     const lastUpdated = personState?.last_updated ?? '';
     const etaEntity = this._config.devices?.find(d => d.name === '__eta__')?.entity ?? '';
 
+    const showEta = !!(this._config.show_eta && etaEntity);
+    const showLastSeen = !!(this._config.show_last_seen && lastUpdated);
+
     return html`
-      <div style=${styleMap(this._hostStyles())} class="card-content" size-tier=${this._sizeTier}>
+      <div style=${styleMap(this._hostStyles(effect, zoneStyle))} class="card-content">
         ${this._config.background_image ? html`<div class="card-background"></div>` : ''}
 
         <!-- Header -->
@@ -176,7 +182,7 @@ export class PersonCard extends LitElement {
               .zoneStyles=${this._config.zone_styles ?? []}
             ></person-card-location-badge>
           </div>
-          ${this._showBadge ? html`
+          ${showBadge ? html`
             <person-card-notification-badge
               .color=${effect.badge_color ?? '#f44336'}
               .icon=${effect.badge_icon ?? 'mdi:alert-circle'}
@@ -199,17 +205,17 @@ export class PersonCard extends LitElement {
         ` : ''}
 
         <!-- Footer (large only) -->
-        ${isLarge ? html`
+        ${isLarge && (showEta || showLastSeen) ? html`
           <div class="divider"></div>
           <div class="footer">
-            ${this._config.show_eta && etaEntity ? html`
+            ${showEta ? html`
               <person-card-eta-display
                 .hass=${this.hass}
                 .etaEntity=${etaEntity}
                 .personZone=${this._personZone}
               ></person-card-eta-display>
             ` : ''}
-            ${this._config.show_last_seen && lastUpdated ? html`
+            ${showLastSeen ? html`
               <person-card-last-seen
                 .lastUpdated=${lastUpdated}
                 .format=${'relative'}
