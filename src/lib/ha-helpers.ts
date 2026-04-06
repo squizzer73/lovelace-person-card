@@ -40,6 +40,7 @@ export function getConnectivity(hass: HassLike, device: DeviceConfig): Connectiv
 
 export function formatLastSeen(lastUpdated: string, format: 'relative' | 'absolute'): string {
   const date = new Date(lastUpdated);
+  if (isNaN(date.getTime())) return 'unknown';
   if (format === 'absolute') {
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
   }
@@ -62,7 +63,7 @@ export function shouldShowNotificationBadge(
 
   for (const device of devices) {
     const battery = getBatteryLevel(hass, device);
-    if (battery !== null && battery < 20) return true;
+    if (battery !== null && battery <= 20) return true;
     if (getConnectivity(hass, device) === 'offline') return true;
   }
   return false;

@@ -58,6 +58,13 @@ describe('getBatteryLevel', () => {
     } as any;
     expect(getBatteryLevel(hass, { entity: 'device_tracker.x' })).toBeNull();
   });
+
+  it('returns 0 when battery is at 0%', () => {
+    const hass = {
+      states: { 'device_tracker.x': { state: 'home', attributes: { battery_level: 0 }, last_updated: '' } },
+    } as any;
+    expect(getBatteryLevel(hass, { entity: 'device_tracker.x' })).toBe(0);
+  });
 });
 
 describe('getConnectivity', () => {
@@ -78,6 +85,20 @@ describe('getConnectivity', () => {
 
   it('returns unknown when entity is missing', () => {
     expect(getConnectivity(mockHass, { entity: 'device_tracker.missing' })).toBe('unknown');
+  });
+
+  it('returns offline when connectivity_entity state is off', () => {
+    const hass = {
+      states: { 'binary_sensor.wifi': { state: 'off', attributes: {}, last_updated: '' } },
+    } as any;
+    expect(getConnectivity(hass, { entity: 'device_tracker.phone', connectivity_entity: 'binary_sensor.wifi' })).toBe('offline');
+  });
+
+  it('returns online when device state is the literal "online"', () => {
+    const hass = {
+      states: { 'sensor.device': { state: 'online', attributes: {}, last_updated: '' } },
+    } as any;
+    expect(getConnectivity(hass, { entity: 'sensor.device' })).toBe('online');
   });
 });
 
@@ -108,6 +129,14 @@ describe('formatLastSeen', () => {
     const result = formatLastSeen(date.toISOString(), 'absolute');
     expect(result).toMatch(/14:32/);
   });
+
+  it('returns "unknown" for empty string', () => {
+    expect(formatLastSeen('', 'relative')).toBe('unknown');
+  });
+
+  it('returns "unknown" for invalid date string', () => {
+    expect(formatLastSeen('not-a-date', 'relative')).toBe('unknown');
+  });
 });
 
 describe('shouldShowNotificationBadge', () => {
@@ -130,6 +159,26 @@ describe('shouldShowNotificationBadge', () => {
       },
     } as any;
     expect(shouldShowNotificationBadge(hass, [], 'person.mark')).toBe(true);
+  });
+
+  it('returns true when battery is exactly 20%', () => {
+    const hass = {
+      states: {
+        'device_tracker.phone': { state: 'home', attributes: { battery_level: 20 }, last_updated: '' },
+        'person.mark': { state: 'home', attributes: {}, last_updated: '' },
+      },
+    } as any;
+    expect(shouldShowNotificationBadge(hass, [{ entity: 'device_tracker.phone' }], 'person.mark')).toBe(true);
+  });
+
+  it('returns true when battery is 0%', () => {
+    const hass = {
+      states: {
+        'device_tracker.phone': { state: 'home', attributes: { battery_level: 0 }, last_updated: '' },
+        'person.mark': { state: 'home', attributes: {}, last_updated: '' },
+      },
+    } as any;
+    expect(shouldShowNotificationBadge(hass, [{ entity: 'device_tracker.phone' }], 'person.mark')).toBe(true);
   });
 
   it('returns false when all devices have good battery and are online', () => {
