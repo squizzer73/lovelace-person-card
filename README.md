@@ -10,6 +10,20 @@ A bold, opinionated at-a-glance status card for a person in Home Assistant.
 
 ---
 
+## Screenshots
+
+### Card sizes
+
+| Small | Medium | Large |
+|-------|--------|-------|
+| ![Small](docs/screenshots/small.png) | ![Medium](docs/screenshots/medium.png) | ![Large](docs/screenshots/large.png) |
+
+### Editor
+
+![Editor](docs/screenshots/editor.png)
+
+---
+
 ## Features
 
 - **Zone-based location** — hero display with custom icon, label, and colour per zone
