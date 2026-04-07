@@ -1,6 +1,5 @@
 import { LitElement, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { styleMap } from 'lit/directives/style-map.js';
 import type { HomeAssistant } from 'custom-card-helpers';
 import type { PersonCardConfig, SizeTier, StyleEffect, ZoneStyleConfig } from './types';
 import { cardStyles } from './styles';
@@ -116,23 +115,32 @@ export class PersonCard extends LitElement {
     return this._personState?.state ?? 'unknown';
   }
 
-  private _hostStyles(effect: StyleEffect, zoneStyle: ZoneStyleConfig | undefined): Record<string, string> {
-    const styles: Record<string, string> = {};
+  protected updated(): void {
+    if (!this._config || !this.hass) return;
+
+    const effect: StyleEffect = this._config.conditions?.length
+      ? evaluateConditions(this._config.conditions, this.hass)
+      : {};
+    const zoneStyle = this._config.zone_styles?.find(s => s.zone === this._personZone);
 
     const bg = effect.background_color ?? zoneStyle?.background_color;
-    if (bg) styles['--pc-background'] = bg;
+    if (bg) this.style.setProperty('--pc-background', bg);
+    else this.style.removeProperty('--pc-background');
 
     const borderColor = effect.border_color ?? zoneStyle?.border_color;
     if (borderColor) {
-      styles['--pc-border-color'] = borderColor;
-      styles['--pc-border-width'] = `${effect.border_width ?? 2}px`;
+      this.style.setProperty('--pc-border-color', borderColor);
+      this.style.setProperty('--pc-border-width', `${effect.border_width ?? 2}px`);
+    } else {
+      this.style.removeProperty('--pc-border-color');
+      this.style.removeProperty('--pc-border-width');
     }
 
     if (this._config.background_image) {
-      styles['--pc-background-image'] = `url('${this._config.background_image}')`;
+      this.style.setProperty('--pc-background-image', `url('${this._config.background_image}')`);
+    } else {
+      this.style.removeProperty('--pc-background-image');
     }
-
-    return styles;
   }
 
   render() {
@@ -149,8 +157,6 @@ export class PersonCard extends LitElement {
       ? evaluateConditions(this._config.conditions, this.hass)
       : {};
 
-    const zoneStyle = this._config.zone_styles?.find(s => s.zone === this._personZone);
-
     const showBadge = this._config.show_notification_badge !== false
       && (effect.badge_color || effect.badge_icon
         ? true
@@ -162,11 +168,19 @@ export class PersonCard extends LitElement {
     const lastUpdated = personState?.last_updated ?? '';
     const etaEntity = this._config.devices?.find(d => d.name === '__eta__')?.entity ?? '';
 
+    // Geocoded address — only on medium/large, only when outside all zones
+    const address = (!isSmall && this._personZone === 'not_home' && this._config.address_entity)
+      ? (() => {
+          const s = this.hass.states[this._config.address_entity!];
+          return (s && s.state !== 'unavailable' && s.state !== 'unknown') ? s.state : '';
+        })()
+      : '';
+
     const showEta = !!(this._config.show_eta && etaEntity);
     const showLastSeen = !!(this._config.show_last_seen && lastUpdated);
 
     return html`
-      <div style=${styleMap(this._hostStyles(effect, zoneStyle))} class="card-content">
+      <div class="card-content">
         ${this._config.background_image ? html`<div class="card-background"></div>` : ''}
 
         <!-- Header -->
@@ -180,6 +194,7 @@ export class PersonCard extends LitElement {
             <person-card-location-badge
               .zone=${this._personZone}
               .zoneStyles=${this._config.zone_styles ?? []}
+              .address=${address}
             ></person-card-location-badge>
           </div>
           ${showBadge ? html`

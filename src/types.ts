@@ -7,6 +7,7 @@ export interface PersonCardConfig {
   show_eta?: boolean;
   show_last_seen?: boolean;
   show_notification_badge?: boolean;
+  address_entity?: string;
   background_image?: string;
   zone_styles?: ZoneStyleConfig[];
   conditions?: ConditionRule[];

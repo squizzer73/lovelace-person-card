@@ -3,6 +3,19 @@ import { customElement, property, state } from 'lit/decorators.js';
 import type { HomeAssistant } from 'custom-card-helpers';
 import type { PersonCardConfig, DeviceConfig, ZoneStyleConfig, ConditionRule, Condition, StyleEffect } from './types';
 
+const COLOR_SCHEMES = [
+  { name: 'Midnight',        bg: '#1c1c2e', border: '#4fc3f7' },
+  { name: 'Forest Walk',     bg: '#1b2e1b', border: '#76c442' },
+  { name: 'Lava Flow',       bg: '#2e1b1b', border: '#ff6d00' },
+  { name: 'Arctic Drift',    bg: '#1a2332', border: '#80deea' },
+  { name: 'Twilight',        bg: '#2e1b3c', border: '#ce93d8' },
+  { name: 'Emerald City',    bg: '#1b2e28', border: '#ffd700' },
+  { name: 'Rose Gold',       bg: '#2e1c24', border: '#f48fb1' },
+  { name: 'Neon Tokyo',      bg: '#120d1f', border: '#e040fb' },
+  { name: 'Desert Night',    bg: '#2e2416', border: '#ffb300' },
+  { name: 'Northern Lights', bg: '#0d1f1a', border: '#69f0ae' },
+] as const;
+
 @customElement('person-card-editor')
 export class PersonCardEditor extends LitElement {
   @property({ attribute: false }) hass!: HomeAssistant;
@@ -32,12 +45,38 @@ export class PersonCardEditor extends LitElement {
     }
     .row { margin-bottom: 12px; }
     .row label { display: block; font-size: 0.8rem; color: var(--secondary-text-color); margin-bottom: 4px; }
+    .device-block, .zone-block {
+      border: 1px solid var(--divider-color, rgba(0,0,0,0.15));
+      border-radius: 8px; padding: 8px; margin-bottom: 8px;
+    }
+    .device-block ha-entity-picker { display: block; width: 100%; }
+    .device-header-row {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 4px;
+    }
+    .device-label { font-size: 0.78rem; color: var(--secondary-text-color); }
     .device-row, .zone-row, .condition-row {
       display: flex; align-items: center; gap: 8px;
-      background: var(--secondary-background-color);
-      padding: 8px; border-radius: 8px; margin-bottom: 6px;
+      margin-bottom: 6px;
     }
-    .device-row > *, .zone-row > * { flex: 1; }
+    .device-block .device-row, .zone-block .device-row { margin-bottom: 4px; }
+    .device-block .device-row:last-child, .zone-block .device-row:last-child { margin-bottom: 0; }
+    .device-row > *, .zone-row > * { flex: 1; min-width: 0; }
+    .condition-row {
+      border: 1px solid var(--divider-color, rgba(0,0,0,0.15));
+      padding: 8px; border-radius: 8px;
+    }
+    .scheme-row {
+      display: flex; align-items: center; flex-wrap: wrap; gap: 6px;
+      margin: 2px 0 4px;
+    }
+    .scheme-swatch {
+      width: 26px; height: 26px; border-radius: 5px;
+      cursor: pointer; flex-shrink: 0;
+      transition: transform 0.1s, box-shadow 0.1s;
+    }
+    .scheme-swatch:hover { transform: scale(1.2); box-shadow: 0 2px 6px rgba(0,0,0,0.4); }
+    .scheme-divider { width: 1px; height: 24px; background: var(--divider-color, #e0e0e0); flex-shrink: 0; }
     .add-btn {
       display: inline-flex; align-items: center; gap: 4px;
       font-size: 0.82rem; cursor: pointer;
@@ -48,7 +87,7 @@ export class PersonCardEditor extends LitElement {
       background: none; border: none; flex: 0 0 auto;
     }
     .rule-block {
-      background: var(--secondary-background-color);
+      border: 1px solid var(--divider-color, rgba(0,0,0,0.15));
       border-radius: 8px; padding: 10px; margin-bottom: 8px;
     }
     .rule-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
@@ -81,12 +120,14 @@ export class PersonCardEditor extends LitElement {
     return html`
       <div class="row">
         <label>Person Entity</label>
-        <ha-entity-picker
-          .hass=${this.hass}
-          .value=${this._config.person_entity ?? ''}
-          .includeDomains=${['person']}
-          @value-changed=${(e: CustomEvent) => this._set({ person_entity: e.detail.value })}
-        ></ha-entity-picker>
+        <div>
+          <ha-entity-picker
+            .hass=${this.hass}
+            .value=${this._config.person_entity ?? ''}
+            .includeDomains=${['person']}
+            @value-changed=${(e: CustomEvent) => this._set({ person_entity: e.detail.value })}
+          ></ha-entity-picker>
+        </div>
       </div>
       <div class="row">
         <label>Display Name (optional)</label>
@@ -113,40 +154,47 @@ export class PersonCardEditor extends LitElement {
     const devices = (this._config.devices ?? []).filter(d => d.name !== '__eta__');
     return html`
       ${devices.map((device, i) => html`
-        <div class="device-row">
+        <div class="device-block">
+          <div class="device-header-row">
+            <span class="device-label">Device entity</span>
+            <button class="delete-btn" @click=${() => this._removeDevice(i)}>
+              <ha-icon .icon=${'mdi:delete'}></ha-icon>
+            </button>
+          </div>
           <ha-entity-picker
             .hass=${this.hass}
             .value=${device.entity}
-            label="Entity"
             @value-changed=${(e: CustomEvent) => this._updateDevice(i, { entity: e.detail.value })}
           ></ha-entity-picker>
-          <ha-textfield
-            .value=${device.name ?? ''}
-            label="Name"
-            @input=${(e: InputEvent) => this._updateDevice(i, { name: (e.target as HTMLInputElement).value || undefined })}
-          ></ha-textfield>
-          <ha-icon-picker
-            .value=${device.icon ?? ''}
-            label="Icon"
-            @value-changed=${(e: CustomEvent) => this._updateDevice(i, { icon: e.detail.value || undefined })}
-          ></ha-icon-picker>
-          <button class="delete-btn" @click=${() => this._removeDevice(i)}>
-            <ha-icon .icon=${'mdi:delete'}></ha-icon>
-          </button>
-        </div>
-        <div class="device-row" style="opacity:0.7;font-size:0.78rem;">
-          <ha-entity-picker
-            .hass=${this.hass}
-            .value=${device.battery_entity ?? ''}
-            label="Battery entity (optional)"
-            @value-changed=${(e: CustomEvent) => this._updateDevice(i, { battery_entity: e.detail.value || undefined })}
-          ></ha-entity-picker>
-          <ha-entity-picker
-            .hass=${this.hass}
-            .value=${device.connectivity_entity ?? ''}
-            label="Connectivity entity (optional)"
-            @value-changed=${(e: CustomEvent) => this._updateDevice(i, { connectivity_entity: e.detail.value || undefined })}
-          ></ha-entity-picker>
+          <div class="device-row" style="margin-top:6px">
+            <ha-textfield
+              .value=${device.name ?? ''}
+              label="Name"
+              @input=${(e: InputEvent) => this._updateDevice(i, { name: (e.target as HTMLInputElement).value || undefined })}
+            ></ha-textfield>
+            <div style="flex:1;min-width:0">
+              <ha-icon-picker
+                .value=${device.icon ?? ''}
+                label="Icon"
+                @value-changed=${(e: CustomEvent) => this._updateDevice(i, { icon: e.detail.value || undefined })}
+              ></ha-icon-picker>
+            </div>
+          </div>
+          <div style="margin-top:4px;opacity:0.75">
+            <ha-entity-picker
+              .hass=${this.hass}
+              .value=${device.battery_entity ?? ''}
+              label="Battery entity (optional)"
+              @value-changed=${(e: CustomEvent) => this._updateDevice(i, { battery_entity: e.detail.value || undefined })}
+            ></ha-entity-picker>
+            <ha-entity-picker
+              .hass=${this.hass}
+              .value=${device.connectivity_entity ?? ''}
+              label="Connectivity entity (optional)"
+              style="margin-top:4px"
+              @value-changed=${(e: CustomEvent) => this._updateDevice(i, { connectivity_entity: e.detail.value || undefined })}
+            ></ha-entity-picker>
+          </div>
         </div>
       `)}
       <button class="add-btn" @click=${() => this._addDevice()}>
@@ -214,35 +262,49 @@ export class PersonCardEditor extends LitElement {
       <div class="row">
         <label>Zone Styles</label>
         ${zoneStyles.map((zs, i) => html`
-          <div class="zone-row">
-            <ha-textfield
-              .value=${zs.zone}
-              label="Zone name"
-              @input=${(e: InputEvent) => this._updateZoneStyle(i, { zone: (e.target as HTMLInputElement).value })}
-            ></ha-textfield>
-            <ha-textfield
-              .value=${zs.label ?? ''}
-              label="Display label"
-              @input=${(e: InputEvent) => this._updateZoneStyle(i, { label: (e.target as HTMLInputElement).value || undefined })}
-            ></ha-textfield>
-            <ha-icon-picker
-              .value=${zs.icon ?? ''}
-              label="Icon"
-              @value-changed=${(e: CustomEvent) => this._updateZoneStyle(i, { icon: e.detail.value || undefined })}
-            ></ha-icon-picker>
-            <div class="color-row">
-              <label style="font-size:0.75rem">BG</label>
-              <input type="color" .value=${zs.background_color ?? '#1c1c2e'}
-                @input=${(e: InputEvent) => this._updateZoneStyle(i, { background_color: (e.target as HTMLInputElement).value })} />
+          <div class="zone-block">
+            <div class="device-row">
+              <ha-textfield
+                .value=${zs.zone}
+                label="Zone name"
+                @input=${(e: InputEvent) => this._updateZoneStyle(i, { zone: (e.target as HTMLInputElement).value })}
+              ></ha-textfield>
+              <ha-textfield
+                .value=${zs.label ?? ''}
+                label="Display label"
+                @input=${(e: InputEvent) => this._updateZoneStyle(i, { label: (e.target as HTMLInputElement).value || undefined })}
+              ></ha-textfield>
+              <div style="flex:1;min-width:0">
+                <ha-icon-picker
+                  .value=${zs.icon ?? ''}
+                  label="Icon"
+                  @value-changed=${(e: CustomEvent) => this._updateZoneStyle(i, { icon: e.detail.value || undefined })}
+                ></ha-icon-picker>
+              </div>
+              <button class="delete-btn" @click=${() => this._removeZoneStyle(i)}>
+                <ha-icon .icon=${'mdi:delete'}></ha-icon>
+              </button>
             </div>
-            <div class="color-row">
-              <label style="font-size:0.75rem">Border</label>
-              <input type="color" .value=${zs.border_color ?? '#ffffff'}
-                @input=${(e: InputEvent) => this._updateZoneStyle(i, { border_color: (e.target as HTMLInputElement).value })} />
+            <div class="scheme-row">
+              ${COLOR_SCHEMES.map(s => html`
+                <div class="scheme-swatch"
+                  title=${s.name}
+                  style="background:${s.bg};border:3px solid ${s.border}"
+                  @click=${() => this._updateZoneStyle(i, { background_color: s.bg, border_color: s.border })}
+                ></div>
+              `)}
+              <div class="scheme-divider"></div>
+              <div class="color-row">
+                <label style="font-size:0.75rem">BG</label>
+                <input type="color" .value=${zs.background_color ?? '#1c1c2e'}
+                  @input=${(e: InputEvent) => this._updateZoneStyle(i, { background_color: (e.target as HTMLInputElement).value })} />
+              </div>
+              <div class="color-row">
+                <label style="font-size:0.75rem">Border</label>
+                <input type="color" .value=${zs.border_color ?? '#ffffff'}
+                  @input=${(e: InputEvent) => this._updateZoneStyle(i, { border_color: (e.target as HTMLInputElement).value })} />
+              </div>
             </div>
-            <button class="delete-btn" @click=${() => this._removeZoneStyle(i)}>
-              <ha-icon .icon=${'mdi:delete'}></ha-icon>
-            </button>
           </div>
         `)}
         <button class="add-btn" @click=${() => this._addZoneStyle()}>
@@ -306,10 +368,11 @@ export class PersonCardEditor extends LitElement {
         </div>
 
         ${rule.conditions.map((cond, ci) => html`
+          <ha-entity-picker .hass=${this.hass} .value=${cond.entity} label="Entity"
+            style="display:block;width:100%;margin-bottom:4px"
+            @value-changed=${(e: CustomEvent) => this._updateCondition(ri, ci, { entity: e.detail.value })}
+          ></ha-entity-picker>
           <div class="condition-row">
-            <ha-entity-picker .hass=${this.hass} .value=${cond.entity} label="Entity"
-              @value-changed=${(e: CustomEvent) => this._updateCondition(ri, ci, { entity: e.detail.value })}
-            ></ha-entity-picker>
             <ha-textfield .value=${cond.attribute ?? ''} label="Attribute (opt.)"
               @input=${(e: InputEvent) => this._updateCondition(ri, ci, { attribute: (e.target as HTMLInputElement).value || undefined })}
             ></ha-textfield>
@@ -338,6 +401,15 @@ export class PersonCardEditor extends LitElement {
         </button>
 
         <div style="margin-top:10px;font-size:0.8rem;font-weight:600;color:var(--secondary-text-color)">Effect</div>
+        <div class="scheme-row" style="margin-bottom:6px">
+          ${COLOR_SCHEMES.map(s => html`
+            <div class="scheme-swatch"
+              title=${s.name}
+              style="background:${s.bg};border:3px solid ${s.border}"
+              @click=${() => this._updateEffect(ri, { background_color: s.bg, border_color: s.border })}
+            ></div>
+          `)}
+        </div>
         <div class="condition-row" style="flex-wrap:wrap;gap:6px">
           <div class="color-row"><label>Background</label>
             <input type="color" .value=${rule.effect.background_color ?? '#1c1c2e'}
@@ -431,17 +503,34 @@ export class PersonCardEditor extends LitElement {
       </div>
       <div class="row">
         <label>ETA Travel Time Sensor (optional)</label>
-        <ha-entity-picker
-          .hass=${this.hass}
-          .value=${etaEntity}
-          .includeDomains=${['sensor']}
-          label="Travel time sensor"
-          @value-changed=${(e: CustomEvent) => {
-            const devices = (this._config.devices ?? []).filter(d => d.name !== '__eta__');
-            if (e.detail.value) devices.push({ entity: e.detail.value, name: '__eta__' });
-            this._set({ devices });
-          }}
-        ></ha-entity-picker>
+        <div>
+          <ha-entity-picker
+            .hass=${this.hass}
+            .value=${etaEntity}
+            .includeDomains=${['sensor']}
+            label="Travel time sensor"
+            @value-changed=${(e: CustomEvent) => {
+              const devices = (this._config.devices ?? []).filter(d => d.name !== '__eta__');
+              if (e.detail.value) devices.push({ entity: e.detail.value, name: '__eta__' });
+              this._set({ devices });
+            }}
+          ></ha-entity-picker>
+        </div>
+      </div>
+      <div class="row">
+        <label>Geocoded Address Entity (optional)</label>
+        <div>
+          <ha-entity-picker
+            .hass=${this.hass}
+            .value=${this._config.address_entity ?? ''}
+            label="Address sensor"
+            @value-changed=${(e: CustomEvent) => this._set({ address_entity: e.detail.value || undefined })}
+          ></ha-entity-picker>
+        </div>
+        <p style="font-size:0.75rem;color:var(--secondary-text-color);margin:4px 0 0;line-height:1.4">
+          Shown on medium &amp; large when the person is outside all zones.
+          Falls back to "Away" if unavailable. Long addresses scroll automatically.
+        </p>
       </div>
       <div class="row">
         <ha-formfield label="Show last seen">
