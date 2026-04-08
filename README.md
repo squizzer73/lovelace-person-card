@@ -1,13 +1,15 @@
-<link rel="icon" type="image/svg+xml" href="docs/favicon.svg">
 # Person Card
-![Person Card](docs/person_card_readme_banner.svg)
+
+![Person Card](docs/banner.svg)
+
 A bold, opinionated at-a-glance status card for a person in Home Assistant.
 
 > **Full GUI editor — no YAML required.**
 
-![HACS](https://img.shields.io/badge/HACS-Custom-orange.svg)
-![HA Version](https://img.shields.io/badge/HA-2023.9%2B-blue.svg)
-![Release](https://img.shields.io/github/v/release/squizzer73/lovelace-person-card)
+[![HACS](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/hacs/integration)
+[![HA Version](https://img.shields.io/badge/HA-2023.9%2B-blue.svg)](https://www.home-assistant.io)
+[![Release](https://img.shields.io/github/v/release/squizzer73/lovelace-person-card)](https://github.com/squizzer73/lovelace-person-card/releases/latest)
+[![MIT License](https://img.shields.io/badge/licence-MIT-green.svg)](LICENSE)
 
 ---
 
@@ -37,6 +39,10 @@ A bold, opinionated at-a-glance status card for a person in Home Assistant.
 ## Installation
 
 ### HACS (recommended)
+
+[![Open your Home Assistant instance and open this repository inside HACS.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=squizzer73&repository=lovelace-person-card&category=plugin)
+
+Or add manually:
 
 1. In HA → **HACS** → ⋮ → **Custom repositories**
 2. Repository: `squizzer73/lovelace-person-card` · Category: **Dashboard**
