@@ -25,12 +25,15 @@ A bold, opinionated at-a-glance status card for a person in Home Assistant.
 
 - **Zone-based location** — hero display with custom icon, label, and colour per zone
 - **Geocoded address** — shows live address when outside all zones (scrolling ticker for long addresses), falls back to "Away"
-- **Per-device status** — battery bar (colour-coded) and connectivity dot for each tracked device
+- **Per-device status** — battery bar (colour-coded per configurable threshold) and connectivity dot for each tracked device
+- **Configurable battery threshold** — set a low-battery warning level per device (default 20 %); bar turns red and badge triggers at this level
+- **Zone auto-detect** — one-click button reads all `zone.*` entities from HA and pre-populates zone styles automatically
+- **Offline/stale indicator** — avatar dims and a clock badge appears when the person entity hasn't updated within a configurable window
 - **Condition rule builder** — change card background, border, and notification badge based on any HA entity state
 - **10 built-in colour schemes** — one-click presets plus full custom colour override
 - **ETA display** — shows travel time sensor when the person is away (large size)
 - **Last seen timestamp** — relative or absolute, auto-refreshes every 60 s
-- **Notification badge** — auto-triggers on low battery (≤20 %) or via condition rules
+- **Notification badge** — auto-triggers on low battery or offline device, or via condition rules
 - **Adaptive sizing** — `auto` uses ResizeObserver; or pin to `small` / `medium` / `large`
 - **Tabbed GUI editor** — Person · Devices · Appearance · Conditions · Display
 
@@ -81,6 +84,7 @@ show_eta: true
 show_last_seen: true
 show_notification_badge: true
 address_entity: sensor.marks_phone_geocoded_location  # optional
+offline_threshold: 30                           # minutes; 0 or omit to disable
 
 background_image: /local/backgrounds/city.jpg   # optional
 
@@ -105,10 +109,12 @@ devices:
     icon: mdi:cellphone
     battery_entity: sensor.marks_phone_battery
     connectivity_entity: binary_sensor.marks_phone_connected
+    battery_threshold: 25                       # optional — overrides default 20 %
   - entity: device_tracker.marks_ipad
     name: iPad
     icon: mdi:tablet
     battery_entity: sensor.marks_ipad_battery
+    battery_threshold: 15
 
 conditions:
   - id: low-battery-alert
@@ -144,6 +150,7 @@ conditions:
 | `show_last_seen` | boolean | `true` | Show last seen timestamp (large only) |
 | `show_notification_badge` | boolean | `true` | Enable notification badge |
 | `address_entity` | string | — | Sensor with geocoded address string |
+| `offline_threshold` | number | — | Minutes without update before avatar is marked stale; `0` or omit to disable |
 | `background_image` | string | — | URL for background image (25 % opacity overlay) |
 | `zone_styles` | list | `[]` | Per-zone colour/icon overrides |
 | `conditions` | list | `[]` | Condition rules for dynamic styling |
@@ -157,6 +164,7 @@ conditions:
 | `icon` | string | MDI icon (e.g. `mdi:cellphone`) |
 | `battery_entity` | string | `sensor.*` with battery % (0–100) |
 | `connectivity_entity` | string | `binary_sensor.*` — `on` = connected |
+| `battery_threshold` | number | Low-battery threshold in % (default `20`); bar turns red and notification badge triggers at or below this level |
 
 ### Zone style options (`zone_styles` list)
 
@@ -231,6 +239,30 @@ When a person is outside all defined zones, the card can display a live geocoded
    - Short addresses (< 20 chars) — truncates with ellipsis if needed
    - Long addresses — smooth CSS ticker animation, loops seamlessly
 4. Falls back to "Away" if the entity is `unavailable` or `unknown`
+
+---
+
+## Offline / Stale Indicator
+
+When a person's location hasn't updated for a while (e.g. phone was switched off or lost connection), the card can visually flag this:
+
+1. In the card editor → **Display** tab → set **Offline threshold (minutes)**
+2. If the person entity's `last_updated` timestamp is older than the threshold, the avatar will:
+   - Dim to 55 % opacity with a greyscale filter
+   - Show a small **clock badge** at the bottom-right corner
+3. Set to `0` or leave blank to disable the indicator
+
+This is distinct from the connectivity dot on each device tile — the stale indicator reflects the person entity itself not reporting in.
+
+---
+
+## Zone Auto-Detect
+
+Rather than typing zone IDs manually, the editor can read them directly from Home Assistant:
+
+1. In the card editor → **Appearance** tab → click **Auto-detect zones from HA**
+2. All `zone.*` entities in your HA instance are read, and any zones not already configured are added to the list with their friendly name and icon pre-filled
+3. You can then adjust the label, colours, and icon for each zone as normal
 
 ---
 
