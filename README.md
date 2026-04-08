@@ -1,5 +1,6 @@
+<link rel="icon" type="image/svg+xml" href="docs/favicon.svg">
 # Person Card
-
+![Person Card](docs/person_card_readme_banner.svg)
 A bold, opinionated at-a-glance status card for a person in Home Assistant.
 
 > **Full GUI editor — no YAML required.**
