@@ -11,6 +11,7 @@ export interface PersonCardConfig {
   background_image?: string;
   zone_styles?: ZoneStyleConfig[];
   conditions?: ConditionRule[];
+  offline_threshold?: number; // minutes since last update before showing stale indicator; 0 or undefined = disabled
 }
 
 export interface DeviceConfig {
@@ -19,6 +20,7 @@ export interface DeviceConfig {
   icon?: string;
   battery_entity?: string;
   connectivity_entity?: string;
+  battery_threshold?: number; // % — card turns red/triggers badge at this level; default 20
 }
 
 export interface ZoneStyleConfig {

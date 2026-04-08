@@ -195,6 +195,18 @@ export class PersonCardEditor extends LitElement {
               @value-changed=${(e: CustomEvent) => this._updateDevice(i, { connectivity_entity: e.detail.value || undefined })}
             ></ha-entity-picker>
           </div>
+          <div class="device-row" style="margin-top:4px;opacity:0.8">
+            <ha-textfield
+              .value=${String(device.battery_threshold ?? '')}
+              label="Battery alert threshold % (default 20)"
+              type="number"
+              min="0"
+              max="100"
+              @input=${(e: InputEvent) => this._updateDevice(i, {
+                battery_threshold: parseInt((e.target as HTMLInputElement).value) || undefined
+              })}
+            ></ha-textfield>
+          </div>
         </div>
       `)}
       <button class="add-btn" @click=${() => this._addDevice()}>
@@ -261,6 +273,9 @@ export class PersonCardEditor extends LitElement {
       </div>
       <div class="row">
         <label>Zone Styles</label>
+        <button class="add-btn" style="margin-bottom:8px" @click=${() => this._autoDetectZones()}>
+          <ha-icon .icon=${'mdi:magnify'}></ha-icon> Auto-detect zones from HA
+        </button>
         ${zoneStyles.map((zs, i) => html`
           <div class="zone-block">
             <div class="device-row">
@@ -329,6 +344,24 @@ export class PersonCardEditor extends LitElement {
   private _addZoneStyle() {
     const zoneStyles = [...(this._config.zone_styles ?? []), { zone: '' }];
     this._set({ zone_styles: zoneStyles });
+  }
+
+  private _autoDetectZones() {
+    if (!this.hass) return;
+    const existing = new Set((this._config.zone_styles ?? []).map(z => z.zone));
+    const detected = Object.entries(this.hass.states)
+      .filter(([id]) => id.startsWith('zone.'))
+      .map(([id, state]) => {
+        const zoneName = id.replace('zone.', '');
+        return {
+          zone: zoneName,
+          label: (state.attributes['friendly_name'] as string | undefined) ?? zoneName,
+          icon: (state.attributes['icon'] as string | undefined) ?? 'mdi:map-marker',
+        };
+      })
+      .filter(z => !existing.has(z.zone));
+    if (detected.length === 0) return;
+    this._set({ zone_styles: [...(this._config.zone_styles ?? []), ...detected] });
   }
 
   // ── Tab: Conditions ───────────────────────────────────────────────────────────
@@ -547,6 +580,22 @@ export class PersonCardEditor extends LitElement {
             @change=${(e: Event) => this._set({ show_notification_badge: (e.target as HTMLInputElement).checked })}
           ></ha-switch>
         </ha-formfield>
+      </div>
+      <div class="row">
+        <label>Offline threshold (minutes, 0 = disabled)</label>
+        <ha-textfield
+          .value=${String(this._config.offline_threshold ?? 0)}
+          type="number"
+          min="0"
+          placeholder="0"
+          @input=${(e: InputEvent) => {
+            const v = parseInt((e.target as HTMLInputElement).value);
+            this._set({ offline_threshold: v > 0 ? v : undefined });
+          }}
+        ></ha-textfield>
+        <p style="font-size:0.75rem;color:var(--secondary-text-color);margin:4px 0 0;line-height:1.4">
+          Show a stale indicator on the avatar if the person entity hasn't updated within this many minutes.
+        </p>
       </div>
     `;
   }

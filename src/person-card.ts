@@ -168,6 +168,10 @@ export class PersonCard extends LitElement {
     const lastUpdated = personState?.last_updated ?? '';
     const etaEntity = this._config.devices?.find(d => d.name === '__eta__')?.entity ?? '';
 
+    // Stale/offline indicator
+    const isStale = !!(this._config.offline_threshold && this._config.offline_threshold > 0 && personState?.last_updated)
+      && ((Date.now() - new Date(personState!.last_updated).getTime()) / 60_000) > this._config.offline_threshold;
+
     // Geocoded address — only on medium/large, only when outside all zones
     const address = (!isSmall && this._personZone === 'not_home' && this._config.address_entity)
       ? (() => {
@@ -185,10 +189,17 @@ export class PersonCard extends LitElement {
 
         <!-- Header -->
         <div class="header">
-          ${photo
-            ? html`<img class="avatar" src=${photo} alt=${name} />`
-            : html`<div class="avatar-placeholder"><ha-icon icon="mdi:account"></ha-icon></div>`
-          }
+          <div class="avatar-wrapper">
+            ${photo
+              ? html`<img class="avatar ${isStale ? 'stale' : ''}" src=${photo} alt=${name} />`
+              : html`<div class="avatar-placeholder ${isStale ? 'stale' : ''}"><ha-icon icon="mdi:account"></ha-icon></div>`
+            }
+            ${isStale ? html`
+              <div class="stale-indicator">
+                <ha-icon .icon=${'mdi:clock-alert-outline'}></ha-icon>
+              </div>
+            ` : ''}
+          </div>
           <div class="name-zone">
             <div class="name">${name}</div>
             <person-card-location-badge

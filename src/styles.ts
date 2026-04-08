@@ -42,13 +42,39 @@ export const cardStyles = css`
     margin-bottom: 10px;
   }
 
+  .avatar-wrapper {
+    position: relative;
+    flex-shrink: 0;
+  }
+
+  .stale-indicator {
+    position: absolute;
+    bottom: -2px;
+    right: -2px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #555;
+    border: 2px solid var(--pc-background, #1c1c2e);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .stale-indicator ha-icon {
+    --mdc-icon-size: 10px;
+    color: rgba(255,255,255,0.7);
+  }
+
+  .avatar.stale { opacity: 0.55; filter: grayscale(60%); }
+  .avatar-placeholder.stale { opacity: 0.55; filter: grayscale(60%); }
+
   .avatar {
     width: var(--person-card-avatar-size, 48px);
     height: var(--person-card-avatar-size, 48px);
     border-radius: 50%;
     object-fit: cover;
     background: #2d2d50;
-    flex-shrink: 0;
     border: 2px solid rgba(255,255,255,0.15);
   }
 
@@ -80,7 +106,6 @@ export const cardStyles = css`
     display: flex;
     align-items: center;
     justify-content: center;
-    flex-shrink: 0;
   }
 
   .avatar-placeholder ha-icon {

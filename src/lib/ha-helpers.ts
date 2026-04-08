@@ -63,7 +63,8 @@ export function shouldShowNotificationBadge(
 
   for (const device of devices) {
     const battery = getBatteryLevel(hass, device);
-    if (battery !== null && battery <= 20) return true;
+    const threshold = device.battery_threshold ?? 20;
+    if (battery !== null && battery <= threshold) return true;
     if (getConnectivity(hass, device) === 'offline') return true;
   }
   return false;

@@ -61,7 +61,8 @@ export class DeviceTile extends LitElement {
   `;
 
   private batteryColor(level: number): string {
-    if (level <= 20) return '#f44336';
+    const threshold = this.device.battery_threshold ?? 20;
+    if (level <= threshold) return '#f44336';
     if (level < 50) return '#ff9800';
     return '#4caf50';
   }
