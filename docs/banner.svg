@@ -1,0 +1,90 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 400">
+  <rect width="1200" height="400" rx="24" fill="#111827"/>
+  <rect width="520" height="400" rx="24" fill="#0a1628"/>
+  <rect x="500" width="40" height="400" fill="#0a1628"/>
+
+  <!-- Left panel - title and features -->
+  <text x="60" y="120" font-family="system-ui,sans-serif" font-size="64" font-weight="700" fill="#e8f0ff" letter-spacing="-1">Person Card</text>
+  <text x="60" y="162" font-family="system-ui,sans-serif" font-size="22" fill="#5a7898">At-a-glance status for Home Assistant</text>
+
+  <line x1="60" y1="188" x2="460" y2="188" stroke="#1e2d45" stroke-width="1.5"/>
+
+  <circle cx="68" cy="222" r="7" fill="#76c442"/>
+  <text x="86" y="228" font-family="system-ui,sans-serif" font-size="20" fill="#5a7898">Zone-based location</text>
+  <circle cx="68" cy="260" r="7" fill="#4fc3f7"/>
+  <text x="86" y="266" font-family="system-ui,sans-serif" font-size="20" fill="#5a7898">Battery &amp; connectivity</text>
+  <circle cx="68" cy="298" r="7" fill="#ce93d8"/>
+  <text x="86" y="304" font-family="system-ui,sans-serif" font-size="20" fill="#5a7898">Condition rules &amp; badges</text>
+
+  <circle cx="280" cy="222" r="7" fill="#76c442"/>
+  <text x="298" y="228" font-family="system-ui,sans-serif" font-size="20" fill="#5a7898">Full GUI editor</text>
+  <circle cx="280" cy="260" r="7" fill="#4fc3f7"/>
+  <text x="298" y="266" font-family="system-ui,sans-serif" font-size="20" fill="#5a7898">Adaptive sizing</text>
+  <circle cx="280" cy="298" r="7" fill="#ce93d8"/>
+  <text x="298" y="304" font-family="system-ui,sans-serif" font-size="20" fill="#5a7898">HACS ready</text>
+
+  <text x="60" y="368" font-family="system-ui,sans-serif" font-size="16" fill="#2a3a55">MIT © Mark Squires</text>
+
+  <!-- Small card -->
+  <rect x="560" y="40" width="170" height="320" rx="18" fill="#1b2e1b" stroke="#76c442" stroke-width="2"/>
+  <rect x="560" y="40" width="170" height="8" rx="4" fill="#76c442"/>
+  <rect x="560" y="44" width="170" height="4" fill="#76c442"/>
+  <circle cx="645" cy="152" r="52" fill="#76c44220"/>
+  <circle cx="645" cy="152" r="52" fill="none" stroke="#76c442" stroke-width="2.5"/>
+  <circle cx="645" cy="136" r="22" fill="#76c442" opacity="0.9"/>
+  <path d="M603 178 Q603 158 645 158 Q687 158 687 178 L687 184 Q687 188 683 188 L607 188 Q603 188 603 184 Z" fill="#76c442" opacity="0.9"/>
+  <rect x="598" y="200" width="94" height="16" rx="8" fill="#0d1f0d"/>
+  <circle cx="614" cy="208" r="6" fill="#76c442"/>
+  <text x="645" y="213" text-anchor="middle" font-family="system-ui,sans-serif" font-size="14" font-weight="600" fill="#76c442">Home</text>
+  <text x="645" y="244" text-anchor="middle" font-family="system-ui,sans-serif" font-size="18" font-weight="600" fill="#c8e6c9">Mark</text>
+  <text x="645" y="266" text-anchor="middle" font-family="system-ui,sans-serif" font-size="13" fill="#4a7a4a">2 min ago</text>
+
+  <!-- Medium card -->
+  <rect x="752" y="24" width="210" height="352" rx="18" fill="#1a2332" stroke="#4fc3f7" stroke-width="2"/>
+  <rect x="752" y="24" width="210" height="8" rx="4" fill="#4fc3f7"/>
+  <rect x="752" y="28" width="210" height="4" fill="#4fc3f7"/>
+  <circle cx="857" cy="122" r="52" fill="#4fc3f720"/>
+  <circle cx="857" cy="122" r="52" fill="none" stroke="#4fc3f7" stroke-width="2.5"/>
+  <circle cx="857" cy="106" r="22" fill="#4fc3f7" opacity="0.9"/>
+  <path d="M815 148 Q815 128 857 128 Q899 128 899 148 L899 154 Q899 158 895 158 L819 158 Q815 158 815 154 Z" fill="#4fc3f7" opacity="0.9"/>
+  <rect x="808" y="170" width="98" height="14" rx="7" fill="#0d1a28"/>
+  <circle cx="824" cy="177" r="5" fill="#4fc3f7"/>
+  <text x="857" y="182" text-anchor="middle" font-family="system-ui,sans-serif" font-size="13" font-weight="600" fill="#4fc3f7">Work</text>
+  <text x="857" y="210" text-anchor="middle" font-family="system-ui,sans-serif" font-size="18" font-weight="600" fill="#b3e5fc">Kate</text>
+  <line x1="768" y1="228" x2="946" y2="228" stroke="#1e2d45" stroke-width="1"/>
+  <rect x="768" y="240" width="100" height="9" rx="4.5" fill="#1e2d45"/>
+  <rect x="768" y="240" width="82" height="9" rx="4.5" fill="#4caf50"/>
+  <circle cx="880" cy="245" r="8" fill="#76c442"/>
+  <text x="768" y="270" font-family="system-ui,sans-serif" font-size="13" fill="#4a6a8a">iPad</text>
+  <rect x="768" y="276" width="100" height="9" rx="4.5" fill="#1e2d45"/>
+  <rect x="768" y="276" width="20" height="9" rx="4.5" fill="#ff9800"/>
+  <circle cx="880" cy="281" r="8" fill="#2a3550"/>
+  <circle cx="938" cy="48" r="18" fill="#f44336"/>
+  <rect x="931" y="39" width="14" height="16" rx="2.5" fill="#fff"/>
+  <rect x="934" y="56" width="8" height="6" rx="1" fill="#fff"/>
+
+  <!-- Large card -->
+  <rect x="984" y="8" width="200" height="384" rx="18" fill="#2e1b3c" stroke="#ce93d8" stroke-width="2"/>
+  <rect x="984" y="8" width="200" height="8" rx="4" fill="#ce93d8"/>
+  <rect x="984" y="12" width="200" height="4" fill="#ce93d8"/>
+  <circle cx="1084" cy="106" r="52" fill="#ce93d820"/>
+  <circle cx="1084" cy="106" r="52" fill="none" stroke="#ce93d8" stroke-width="2.5"/>
+  <circle cx="1084" cy="90" r="22" fill="#ce93d8" opacity="0.9"/>
+  <path d="M1042 132 Q1042 112 1084 112 Q1126 112 1126 132 L1126 138 Q1126 142 1122 142 L1046 142 Q1042 142 1042 138 Z" fill="#ce93d8" opacity="0.9"/>
+  <rect x="1034" y="154" width="100" height="14" rx="7" fill="#1e0d2e"/>
+  <circle cx="1050" cy="161" r="5" fill="#ce93d8"/>
+  <text x="1084" y="166" text-anchor="middle" font-family="system-ui,sans-serif" font-size="13" font-weight="600" fill="#ce93d8">University</text>
+  <text x="1084" y="194" text-anchor="middle" font-family="system-ui,sans-serif" font-size="18" font-weight="600" fill="#f3e5f5">James</text>
+  <line x1="998" y1="210" x2="1170" y2="210" stroke="#2a1a3c" stroke-width="1"/>
+  <rect x="998" y="222" width="90" height="9" rx="4.5" fill="#1e0d2e"/>
+  <rect x="998" y="222" width="76" height="9" rx="4.5" fill="#4caf50"/>
+  <circle cx="1100" cy="227" r="8" fill="#76c442"/>
+  <rect x="998" y="238" width="90" height="9" rx="4.5" fill="#1e0d2e"/>
+  <rect x="998" y="238" width="58" height="9" rx="4.5" fill="#4caf50"/>
+  <circle cx="1100" cy="243" r="8" fill="#76c442"/>
+  <line x1="998" y1="258" x2="1170" y2="258" stroke="#2a1a3c" stroke-width="1"/>
+  <text x="998" y="278" font-family="system-ui,sans-serif" font-size="13" fill="#7a5a8a">ETA home</text>
+  <text x="1170" y="278" text-anchor="end" font-family="system-ui,sans-serif" font-size="13" font-weight="600" fill="#f3e5f5">34 min</text>
+  <line x1="998" y1="292" x2="1170" y2="292" stroke="#2a1a3c" stroke-width="1"/>
+  <text x="998" y="312" font-family="system-ui,sans-serif" font-size="12" fill="#7a5a8a">Last seen 5 min ago</text>
+</svg>
