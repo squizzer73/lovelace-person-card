@@ -7,6 +7,16 @@ Versions follow [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [0.2.0] — 2026-04-08
+
+### Added
+
+- **Configurable battery threshold per device** — set `battery_threshold` on each device (default 20 %); the bar turns red and the notification badge triggers at this level. Configurable in the Devices tab editor.
+- **Zone auto-detect** — "Auto-detect zones from HA" button in the Appearance tab reads all `zone.*` entities from HA and pre-populates the zone styles list with their friendly name and icon. Skips zones already configured.
+- **Offline / stale indicator** — set `offline_threshold` (minutes) in the Display tab; when the person entity hasn't updated within that window the avatar dims with a greyscale filter and a small clock badge appears at the bottom-right corner.
+
+---
+
 ## [0.1.0] — 2026-04-07
 
 Initial release.
