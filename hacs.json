@@ -1,6 +1,5 @@
 {
   "name": "Person Card",
-  "description": "Bold at-a-glance person status card with zone location, device battery, geocoded address, and condition rules. Full GUI editor.",
   "render_readme": true,
   "homeassistant": "2023.9.0",
   "filename": "person-card.js"
