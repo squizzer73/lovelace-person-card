@@ -34,7 +34,9 @@ A bold, opinionated at-a-glance status card for a person in Home Assistant.
 - **ETA display** — shows travel time sensor when the person is away (large size)
 - **Last seen timestamp** — relative or absolute, auto-refreshes every 60 s
 - **Notification badge** — auto-triggers on low battery or offline device, or via condition rules
-- **Adaptive sizing** — `auto` uses ResizeObserver; or pin to `small` / `medium` / `large`
+- **Hero layout** — centred portrait with 120 px avatar, zone-coloured glow ring, and horizontal device icon grid
+- **Stats layout** — immersive full-bleed background with in-zone duration and last-seen stat boxes
+- **Adaptive sizing** — `auto` uses ResizeObserver; or pin to `small` / `medium` / `large` / `hero` / `stats`
 - **Tabbed GUI editor** — Person · Devices · Appearance · Conditions · Display
 
 ---
@@ -79,7 +81,7 @@ type: custom:person-card
 person_entity: person.mark
 name: Mark                          # optional — overrides entity friendly name
 photo: /local/mark.jpg              # optional — overrides entity picture
-size: auto                          # auto | small | medium | large
+size: auto                          # auto | small | medium | large | hero | stats
 show_eta: true
 show_last_seen: true
 show_notification_badge: true
@@ -145,13 +147,13 @@ conditions:
 | `person_entity` | string | **required** | `person.*` entity ID |
 | `name` | string | entity friendly name | Override display name |
 | `photo` | string | entity picture | Override avatar URL |
-| `size` | `auto` \| `small` \| `medium` \| `large` | `auto` | Card size tier |
+| `size` | `auto` \| `small` \| `medium` \| `large` \| `hero` \| `stats` | `auto` | Card size tier |
 | `show_eta` | boolean | `true` | Show ETA footer (large only) |
-| `show_last_seen` | boolean | `true` | Show last seen timestamp (large only) |
+| `show_last_seen` | boolean | `true` | Show last seen timestamp (large and hero) |
 | `show_notification_badge` | boolean | `true` | Enable notification badge |
 | `address_entity` | string | — | Sensor with geocoded address string |
 | `offline_threshold` | number | — | Minutes without update before avatar is marked stale; `0` or omit to disable |
-| `background_image` | string | — | URL for background image (25 % opacity overlay) |
+| `background_image` | string | — | URL for background image (25 % opacity on standard sizes; 55 % on `stats`) |
 | `zone_styles` | list | `[]` | Per-zone colour/icon overrides |
 | `conditions` | list | `[]` | Condition rules for dynamic styling |
 
@@ -280,13 +282,61 @@ Override card appearance from your Lovelace theme or card-mod:
 
 ## Size Tiers
 
-| Tier | Width | Shows |
-|------|-------|-------|
-| `small` | < 200 px | Avatar · Name · Zone only |
-| `medium` | 200–400 px | + Devices |
-| `large` | > 400 px | + ETA · Last seen |
+| Tier | Trigger | Shows |
+|------|---------|-------|
+| `small` | < 200 px (auto) | Avatar · Name · Zone only |
+| `medium` | 200–400 px (auto) | + Devices |
+| `large` | > 400 px (auto) | + ETA · Last seen |
+| `hero` | manual only | Centred portrait — see below |
+| `stats` | manual only | Immersive stats — see below |
 
-In `auto` mode (default) the tier updates live via ResizeObserver as the column width changes.
+In `auto` mode (default) the tier updates live via ResizeObserver as the column width changes. `hero` and `stats` must be set manually — they are not part of the auto breakpoint chain.
+
+---
+
+## Hero Layout
+
+A centred, portrait-style card designed as a feature card in a full-width column or side panel.
+
+- **120 px avatar** with a glow ring that picks up the zone border colour (white glow if no colour is set)
+- Name in large bold type, zone badge centred below
+- **Horizontal device icon grid** — each device shows as a frosted tile with icon, name, battery bar + %, and connectivity dot
+- Last seen in a centred footer
+- Notification badge pinned to the top-right corner
+- Background image supported at 25 % opacity
+
+```yaml
+type: custom:person-card
+person_entity: person.mark
+size: hero
+background_image: /local/backgrounds/city.jpg
+zone_styles:
+  - zone: home
+    background_color: "#1b2e1b"
+    border_color: "#76c442"   # becomes the glow ring colour
+```
+
+---
+
+## Stats Layout
+
+An immersive, data-rich card with a prominent background image and presence statistics.
+
+- **Background image at 55 % opacity** — much more cinematic than other sizes
+- 80 px avatar with name and zone badge in the header
+- **"In zone X"** sub-label showing how long the person has been in their current zone
+- **Two stat boxes** in a 2-column grid:
+  - *In zone* — duration since the person entity's state last changed (e.g. `6h 14m`)
+  - *Last seen* — time since the entity last updated (e.g. `2m`)
+- Full device list in a frosted-glass panel with backdrop blur
+- Notification badge in the header
+
+```yaml
+type: custom:person-card
+person_entity: person.mark
+size: stats
+background_image: /local/backgrounds/city.jpg
+```
 
 ---
 

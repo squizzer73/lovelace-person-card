@@ -7,6 +7,16 @@ Versions follow [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [0.3.0] — 2026-04-10
+
+### Added
+
+- **Hero layout** (`size: hero`) — centred portrait card with a 120 px avatar, zone-coloured glow ring, horizontal device icon grid (icon, name, battery bar, connectivity dot per device), and last-seen footer. Notification badge pinned top-right.
+- **Stats layout** (`size: stats`) — immersive full-bleed background at 55 % opacity with backdrop-blur frosted panels. Header shows avatar, name, zone, and how long the person has been in the current zone. Two stat boxes display *In zone* duration (from `last_changed`) and *Last seen* (from `last_updated`). Full device list in a frosted-glass panel below.
+- Size picker in the editor now includes **Hero** and **Stats** buttons with inline descriptions.
+
+---
+
 ## [0.2.0] — 2026-04-08
 
 ### Added
