@@ -91,7 +91,7 @@ export class PersonCardEditor extends LitElement {
       border-radius: 8px; padding: 10px; margin-bottom: 8px;
     }
     .rule-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
-    .segment-control { display: flex; gap: 4px; }
+    .segment-control { display: flex; gap: 4px; flex-wrap: wrap; }
     .segment-btn {
       padding: 4px 12px; border-radius: 6px; font-size: 0.8rem; cursor: pointer;
       border: 1px solid var(--divider-color); background: none;
@@ -255,13 +255,24 @@ export class PersonCardEditor extends LitElement {
       <div class="row">
         <label>Card Size</label>
         <div class="segment-control">
-          ${(['auto', 'small', 'medium', 'large'] as const).map(s => html`
-            <button class="segment-btn ${this._config.size === s ? 'active' : ''}"
-              @click=${() => this._set({ size: s })}>
-              ${s.charAt(0).toUpperCase() + s.slice(1)}
+          ${([
+            { value: 'auto',   label: 'Auto'   },
+            { value: 'small',  label: 'Small'  },
+            { value: 'medium', label: 'Medium' },
+            { value: 'large',  label: 'Large'  },
+            { value: 'hero',   label: 'Hero'   },
+            { value: 'stats',  label: 'Stats'  },
+          ] as const).map(s => html`
+            <button class="segment-btn ${this._config.size === s.value ? 'active' : ''}"
+              @click=${() => this._set({ size: s.value })}>
+              ${s.label}
             </button>
           `)}
         </div>
+        <p style="font-size:0.75rem;color:var(--secondary-text-color);margin:6px 0 0;line-height:1.4">
+          <strong>Hero</strong> — centred portrait with large avatar, glow ring, and device icon grid.<br>
+          <strong>Stats</strong> — immersive background with zone duration and last-seen stat boxes.
+        </p>
       </div>
       <div class="row">
         <label>Background Image URL (optional)</label>

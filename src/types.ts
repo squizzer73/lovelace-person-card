@@ -58,7 +58,7 @@ export interface StyleEffect {
 }
 
 /** Resolved display tier — never 'auto'. Use SizeConfig for the config field. */
-export type SizeTier = 'small' | 'medium' | 'large';
+export type SizeTier = 'small' | 'medium' | 'large' | 'hero' | 'stats';
 
 /** Config value for size — includes 'auto' which resolves via ResizeObserver. */
 export type SizeConfig = 'auto' | SizeTier;

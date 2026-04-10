@@ -151,4 +151,174 @@ export const cardStyles = css`
     font-size: 0.78rem;
     color: rgba(255,255,255,0.55);
   }
+
+  /* ─── Hero tier ──────────────────────────────────────── */
+
+  :host([size-tier='hero']) .card-content {
+    padding: 28px 20px 22px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  :host([size-tier='hero']) .avatar-wrapper {
+    margin-bottom: 14px;
+  }
+
+  :host([size-tier='hero']) .avatar,
+  :host([size-tier='hero']) .avatar-placeholder {
+    width: 120px;
+    height: 120px;
+    border: 3px solid rgba(255,255,255,0.2);
+  }
+
+  :host([size-tier='hero']) .avatar-placeholder ha-icon {
+    --mdc-icon-size: 56px;
+  }
+
+  :host([size-tier='hero']) .name {
+    font-size: 1.6rem;
+    font-weight: 800;
+    letter-spacing: 0.01em;
+    margin-bottom: 6px;
+  }
+
+  :host([size-tier='hero']) .hero-zone {
+    margin-bottom: 18px;
+  }
+
+  .hero-devices {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+  }
+
+  .hero-device-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    background: rgba(255,255,255,0.07);
+    border-radius: 10px;
+    padding: 10px 14px;
+    min-width: 68px;
+  }
+
+  .hero-device-icon ha-icon {
+    --mdc-icon-size: 28px;
+    color: rgba(255,255,255,0.85);
+  }
+
+  .hero-device-name {
+    font-size: 0.68rem;
+    color: rgba(255,255,255,0.55);
+    white-space: nowrap;
+    max-width: 80px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .hero-battery-bar {
+    width: 48px;
+    height: 4px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .hero-battery-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 0.3s ease;
+  }
+
+  .hero-battery-pct {
+    font-size: 0.68rem;
+    font-weight: 600;
+  }
+
+  .hero-connectivity {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    margin-top: 1px;
+  }
+
+  :host([size-tier='hero']) .footer {
+    margin-top: 16px;
+    flex-direction: row;
+    justify-content: center;
+  }
+
+  /* ─── Stats tier ─────────────────────────────────────── */
+
+  :host([size-tier='stats']) .card-background {
+    opacity: 0.55;
+  }
+
+  :host([size-tier='stats']) .card-content {
+    padding: 16px;
+  }
+
+  :host([size-tier='stats']) .avatar,
+  :host([size-tier='stats']) .avatar-placeholder {
+    width: 80px;
+    height: 80px;
+  }
+
+  :host([size-tier='stats']) .avatar-placeholder ha-icon {
+    --mdc-icon-size: 38px;
+  }
+
+  :host([size-tier='stats']) .name {
+    font-size: 1.25rem;
+  }
+
+  .stats-since {
+    font-size: 0.72rem;
+    color: rgba(255,255,255,0.5);
+    margin-top: 3px;
+  }
+
+  .stats-boxes {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin: 12px 0;
+  }
+
+  .stats-box {
+    background: rgba(0,0,0,0.3);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-radius: 10px;
+    padding: 10px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .stats-box-label {
+    font-size: 0.68rem;
+    color: rgba(255,255,255,0.45);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .stats-box-value {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: rgba(255,255,255,0.92);
+  }
+
+  :host([size-tier='stats']) .devices {
+    background: rgba(0,0,0,0.25);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    border-radius: 10px;
+    padding: 8px;
+  }
 `;
