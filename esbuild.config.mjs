@@ -2,10 +2,8 @@ import * as esbuild from 'esbuild';
 
 const isWatch = process.argv.includes('--watch');
 
-const options = {
-  entryPoints: ['src/person-card.ts'],
+const sharedOptions = {
   bundle: true,
-  outfile: 'dist/person-card.js',
   format: 'esm',
   target: 'es2020',
   minify: !isWatch,
@@ -13,10 +11,14 @@ const options = {
 };
 
 if (isWatch) {
-  const ctx = await esbuild.context(options);
-  await ctx.watch();
+  const ctx1 = await esbuild.context({ ...sharedOptions, entryPoints: ['src/person-card.ts'], outfile: 'dist/person-card.js' });
+  const ctx2 = await esbuild.context({ ...sharedOptions, entryPoints: ['src/family-card.ts'], outfile: 'dist/family-card.js' });
+  await Promise.all([ctx1.watch(), ctx2.watch()]);
   console.log('Watching for changes...');
 } else {
-  await esbuild.build(options);
-  console.log('Build complete: dist/person-card.js');
+  await Promise.all([
+    esbuild.build({ ...sharedOptions, entryPoints: ['src/person-card.ts'], outfile: 'dist/person-card.js' }),
+    esbuild.build({ ...sharedOptions, entryPoints: ['src/family-card.ts'], outfile: 'dist/family-card.js' }),
+  ]);
+  console.log('Build complete: dist/person-card.js + dist/family-card.js');
 }
