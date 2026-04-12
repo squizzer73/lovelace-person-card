@@ -20,6 +20,7 @@ import { shouldShowNotificationBadge } from './lib/ha-helpers';
 import { formatDuration } from './shared/format-utils';
 import { getBatteryColor } from './shared/battery-utils';
 import { migrateEtaSentinel } from './shared/eta-migration';
+import { resolveZoneStyles, THEME_EVENT } from './shared/theme-registry';
 
 // Register sub-components
 import './components/location-badge';
@@ -94,12 +95,16 @@ export class PersonCard extends LitElement {
   connectedCallback() {
     super.connectedCallback();
     if (this._config) this._setupResizeObserver();
+    window.addEventListener(THEME_EVENT, this._onThemeUpdated);
   }
 
   disconnectedCallback() {
     super.disconnectedCallback();
     this._resizeObserver?.disconnect();
+    window.removeEventListener(THEME_EVENT, this._onThemeUpdated);
   }
+
+  private _onThemeUpdated = () => { this.requestUpdate(); };
 
   private _setSizeTier(tier: SizeTier) {
     if (this._sizeTier === tier) return;
@@ -136,7 +141,7 @@ export class PersonCard extends LitElement {
     const effect: StyleEffect = this._config.conditions?.length
       ? evaluateConditions(this._config.conditions, this.hass)
       : {};
-    const zoneStyle = this._config.zone_styles?.find(s => s.zone === this._personZone);
+    const zoneStyle = resolveZoneStyles(this._config.zone_styles ?? []).find(s => s.zone === this._personZone);
 
     const bg = effect.background_color ?? zoneStyle?.background_color;
     if (bg) this.style.setProperty('--pc-background', bg);
@@ -190,7 +195,7 @@ export class PersonCard extends LitElement {
 
   private _renderHero(p: RenderParams) {
     const { name, photo, personState, effect, showBadge, isStale, address, devices } = p;
-    const zoneStyle = this._config.zone_styles?.find(s => s.zone === this._personZone);
+    const zoneStyle = resolveZoneStyles(this._config.zone_styles ?? []).find(s => s.zone === this._personZone);
     const glowColor = effect.border_color ?? zoneStyle?.border_color;
     const avatarStyle = glowColor
       ? `box-shadow: 0 0 0 4px ${glowColor}66, 0 0 32px ${glowColor}44;`
@@ -225,7 +230,7 @@ export class PersonCard extends LitElement {
         <div class="hero-zone">
           <person-card-location-badge
             .zone=${this._personZone}
-            .zoneStyles=${this._config.zone_styles ?? []}
+            .zoneStyles=${resolveZoneStyles(this._config.zone_styles ?? [])}
             .address=${address}
           ></person-card-location-badge>
         </div>
@@ -275,7 +280,7 @@ export class PersonCard extends LitElement {
             <div class="name">${name}</div>
             <person-card-location-badge
               .zone=${this._personZone}
-              .zoneStyles=${this._config.zone_styles ?? []}
+              .zoneStyles=${resolveZoneStyles(this._config.zone_styles ?? [])}
               .address=${address}
             ></person-card-location-badge>
             <div class="stats-since">In zone ${zoneSince}</div>
@@ -386,7 +391,7 @@ export class PersonCard extends LitElement {
             <div class="name">${name}</div>
             <person-card-location-badge
               .zone=${this._personZone}
-              .zoneStyles=${this._config.zone_styles ?? []}
+              .zoneStyles=${resolveZoneStyles(this._config.zone_styles ?? [])}
               .address=${address}
             ></person-card-location-badge>
           </div>
