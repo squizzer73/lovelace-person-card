@@ -38,20 +38,7 @@ export function getConnectivity(hass: HassLike, device: DeviceConfig): Connectiv
   return 'unknown';
 }
 
-export function formatLastSeen(lastUpdated: string, format: 'relative' | 'absolute'): string {
-  const date = new Date(lastUpdated);
-  if (isNaN(date.getTime())) return 'unknown';
-  if (format === 'absolute') {
-    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
-  }
-  const diffMs = Date.now() - date.getTime();
-  const diffMin = Math.floor(diffMs / 60_000);
-  if (diffMin < 1) return 'just now';
-  if (diffMin < 60) return `${diffMin} min ago`;
-  const diffHr = Math.floor(diffMin / 60);
-  if (diffHr < 24) return `${diffHr}h ago`;
-  return `${Math.floor(diffHr / 24)}d ago`;
-}
+export { formatLastSeen } from '../shared/format-utils';
 
 export function shouldShowNotificationBadge(
   hass: HassLike,

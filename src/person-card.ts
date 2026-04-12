@@ -17,6 +17,7 @@ type RenderParams = {
 import { cardStyles } from './styles';
 import { evaluateConditions } from './lib/condition-engine';
 import { shouldShowNotificationBadge } from './lib/ha-helpers';
+import { formatDuration } from './shared/format-utils';
 
 // Register sub-components
 import './components/location-badge';
@@ -155,24 +156,6 @@ export class PersonCard extends LitElement {
     }
   }
 
-  // ── Helpers ────────────────────────────────────────────────────────────────
-
-  /** Format a duration from an ISO timestamp to now as a human-readable string. */
-  private _formatDuration(isoString: string): string {
-    if (!isoString) return '—';
-    const ms = Date.now() - new Date(isoString).getTime();
-    if (ms < 0) return '—';
-    const totalMins = Math.floor(ms / 60_000);
-    if (totalMins < 1) return '< 1m';
-    if (totalMins < 60) return `${totalMins}m`;
-    const hrs = Math.floor(totalMins / 60);
-    const mins = totalMins % 60;
-    if (hrs < 24) return mins > 0 ? `${hrs}h ${mins}m` : `${hrs}h`;
-    const days = Math.floor(hrs / 24);
-    const remainHrs = hrs % 24;
-    return remainHrs > 0 ? `${days}d ${remainHrs}h` : `${days}d`;
-  }
-
   /** Renders a single device as a vertical card for the hero layout. */
   private _renderHeroDevice(device: DeviceConfig) {
     const battState = device.battery_entity ? this.hass.states[device.battery_entity] : undefined;
@@ -272,8 +255,8 @@ export class PersonCard extends LitElement {
 
   private _renderStats(p: RenderParams) {
     const { name, photo, personState, effect, showBadge, isStale, address, devices } = p;
-    const zoneSince = personState?.last_changed ? this._formatDuration(personState.last_changed) : '—';
-    const lastSeenAgo = personState?.last_updated ? this._formatDuration(personState.last_updated) : '—';
+    const zoneSince = personState?.last_changed ? formatDuration(personState.last_changed) : '—';
+    const lastSeenAgo = personState?.last_updated ? formatDuration(personState.last_updated) : '—';
     const visibleDevices = devices.filter(d => d.name !== '__eta__');
 
     return html`
