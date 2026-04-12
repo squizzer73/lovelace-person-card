@@ -232,8 +232,93 @@ export class FamilyCard extends LitElement {
   }
 
   // Detailed tier — implemented in Task 16
-  private _renderDetailedRow(_person: FamilyPersonConfig) {
-    return html`<!-- detailed tier: Task 16 -->`;
+  private _renderDetailedRow(person: FamilyPersonConfig) {
+    const zone = this._getPersonZone(person);
+    const zoneStyles = this._zoneStyles();
+    const zoneStyle = resolveZoneStyle(zone, zoneStyles);
+    const isStale = this._isPersonStale(person);
+    const showBadge = this._personShowsBadge(person);
+    const devices = person.devices ?? [];
+    const isExpanded = this._expandedEntity === person.entity;
+    const personState = this.hass.states[person.entity];
+    const zoneDuration = personState?.last_changed ? formatDuration(personState.last_changed) : '';
+    const accentColor = zoneStyle?.border_color ?? 'rgba(255,255,255,0.1)';
+
+    return html`
+      <div class="person-row" style="--row-accent:${accentColor}"
+        @click=${() => { this._expandedEntity = isExpanded ? null : person.entity; }}>
+        <div class="person-row-inner">
+          ${this._renderAvatar(person, isStale)}
+          <div class="person-info">
+            <div class="person-name">${this._getPersonName(person)}</div>
+            <div class="person-zone" style="display:flex;align-items:center;gap:6px">
+              <person-card-location-badge .zone=${zone} .zoneStyles=${zoneStyles}></person-card-location-badge>
+              ${zoneDuration ? html`<span style="font-size:0.7rem;color:rgba(255,255,255,0.35)">· ${zoneDuration}</span>` : ''}
+            </div>
+          </div>
+          <div class="person-row-meta">
+            ${devices.slice(0, 3).map(device => {
+              const battery = getBatteryLevel(this.hass, device);
+              const threshold = device.battery_threshold ?? 20;
+              const color = battery !== null
+                ? (battery <= threshold ? '#f44336' : battery < 50 ? '#ff9800' : '#4caf50')
+                : '#888';
+              return battery !== null ? html`
+                <div class="device-summary">
+                  <ha-icon .icon=${device.icon ?? 'mdi:devices'} style="--mdc-icon-size:12px;color:rgba(255,255,255,0.4)"></ha-icon>
+                  <span class="device-summary-pct" style="color:${color}">${Math.round(battery)}%</span>
+                </div>` : '';
+            })}
+            ${showBadge ? html`<person-card-notification-badge color="#f44336" icon="mdi:alert-circle"></person-card-notification-badge>` : ''}
+            <span class="chevron ${isExpanded ? 'open' : ''}">▾</span>
+          </div>
+        </div>
+
+        ${isExpanded ? html`
+          <div class="expanded-panel" @click=${(e: Event) => e.stopPropagation()}>
+            ${devices.length > 0 ? html`
+              <div class="device-list">
+                ${devices.map(device => html`
+                  <person-card-device-tile
+                    .hass=${this.hass}
+                    .device=${device}
+                    .showLabels=${true}
+                  ></person-card-device-tile>
+                `)}
+              </div>
+            ` : ''}
+            <div class="expanded-footer">
+              ${(person.show_last_seen ?? this._config.show_last_seen) && personState?.last_updated ? html`
+                <person-card-last-seen .lastUpdated=${personState.last_updated} .format=${'relative'}></person-card-last-seen>
+              ` : ''}
+              ${(person.show_eta ?? this._config.show_eta) && person.eta_entity ? html`
+                <person-card-eta-display
+                  .hass=${this.hass}
+                  .etaEntity=${person.eta_entity}
+                  .personZone=${zone}
+                ></person-card-eta-display>
+              ` : ''}
+            </div>
+            <div class="view-full-link"
+              @click=${() => {
+                const action = person.tap_action;
+                if (action && 'navigation_path' in action) {
+                  history.pushState(null, '', action.navigation_path);
+                  window.dispatchEvent(new PopStateEvent('popstate'));
+                } else {
+                  this.dispatchEvent(new CustomEvent('hass-more-info', {
+                    detail: { entityId: person.entity },
+                    bubbles: true,
+                    composed: true,
+                  }));
+                }
+              }}>
+              View full card →
+            </div>
+          </div>
+        ` : ''}
+      </div>
+    `;
   }
 }
 
