@@ -7,7 +7,7 @@ export interface HassLike {
 export interface HassStateLike {
   state: string;
   attributes: Record<string, unknown>;
-  last_updated: string;
+  last_updated?: string;
   last_changed?: string;
 }
 
