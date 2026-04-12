@@ -3,3 +3,4 @@ dist/
 .superpowers/
 *.js.map
 .DS_Store
+.worktrees
