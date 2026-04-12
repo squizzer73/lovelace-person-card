@@ -29,6 +29,7 @@ import './components/notification-badge';
 import './components/eta-display';
 import './components/last-seen';
 import './person-card-editor';
+import './person-card-theme';
 
 // HACS / HA card registration
 declare global {
