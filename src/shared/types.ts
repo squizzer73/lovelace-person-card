@@ -82,3 +82,33 @@ export type ConnectivityState = 'online' | 'offline' | 'unknown';
 export interface PersonCardThemeConfig {
   zone_styles: ZoneStyleConfig[];
 }
+
+export type FamilyCardDensity = 'compact' | 'mini' | 'detailed';
+
+export interface FamilyPersonConfig {
+  entity: string;
+  name?: string;
+  photo?: string;
+  devices?: DeviceConfig[];
+  eta_entity?: string;
+  address_entity?: string;
+  show_eta?: boolean;
+  show_last_seen?: boolean;
+  show_notification_badge?: boolean;
+  offline_threshold?: number;
+  tap_action?: { action: 'more-info' } | { action: 'navigate'; navigation_path: string };
+}
+
+export interface FamilyCardConfig {
+  people?: FamilyPersonConfig[];
+  group_entity?: string;
+  density?: FamilyCardDensity;
+  show_devices?: boolean;
+  show_last_seen?: boolean;
+  show_eta?: boolean;
+  show_notification_badge?: boolean;
+  offline_threshold?: number;
+  zone_styles?: ZoneStyleConfig[];
+  conditions?: ConditionRule[];
+  background_image?: string;
+}
