@@ -19,6 +19,7 @@ import { evaluateConditions } from './lib/condition-engine';
 import { shouldShowNotificationBadge } from './lib/ha-helpers';
 import { formatDuration } from './shared/format-utils';
 import { getBatteryColor } from './shared/battery-utils';
+import { migrateEtaSentinel } from './shared/eta-migration';
 
 // Register sub-components
 import './components/location-badge';
@@ -69,7 +70,7 @@ export class PersonCard extends LitElement {
     if (!config.person_entity) {
       throw new Error('person_entity is required');
     }
-    this._config = {
+    this._config = migrateEtaSentinel({
       size: 'auto',
       show_eta: true,
       show_last_seen: true,
@@ -78,7 +79,7 @@ export class PersonCard extends LitElement {
       zone_styles: [],
       conditions: [],
       ...config,
-    };
+    });
     if (this.isConnected) this._setupResizeObserver();
   }
 
@@ -195,7 +196,7 @@ export class PersonCard extends LitElement {
       ? `box-shadow: 0 0 0 4px ${glowColor}66, 0 0 32px ${glowColor}44;`
       : 'box-shadow: 0 0 0 4px rgba(255,255,255,0.15), 0 0 20px rgba(255,255,255,0.05);';
     const showLastSeen = !!(this._config.show_last_seen && personState?.last_updated);
-    const visibleDevices = devices.filter(d => d.name !== '__eta__');
+    const visibleDevices = devices;
 
     return html`
       <div class="card-content">
@@ -255,7 +256,7 @@ export class PersonCard extends LitElement {
     const { name, photo, personState, effect, showBadge, isStale, address, devices } = p;
     const zoneSince = personState?.last_changed ? formatDuration(personState.last_changed) : '—';
     const lastSeenAgo = personState?.last_updated ? formatDuration(personState.last_updated) : '—';
-    const visibleDevices = devices.filter(d => d.name !== '__eta__');
+    const visibleDevices = devices;
 
     return html`
       <div class="card-content">
@@ -341,7 +342,7 @@ export class PersonCard extends LitElement {
     const isLarge = this._sizeTier === 'large';
     const devices = this._config.devices ?? [];
     const lastUpdated = personState?.last_updated ?? '';
-    const etaEntity = this._config.devices?.find(d => d.name === '__eta__')?.entity ?? '';
+    const etaEntity = this._config.eta_entity ?? '';
 
     // Stale/offline indicator
     const isStale = !!(this._config.offline_threshold && this._config.offline_threshold > 0 && personState?.last_updated)
@@ -401,7 +402,7 @@ export class PersonCard extends LitElement {
         ${!isSmall && devices.length > 0 ? html`
           <div class="divider"></div>
           <div class="devices">
-            ${devices.filter(d => d.name !== '__eta__').map(device => html`
+            ${devices.map(device => html`
               <person-card-device-tile
                 .hass=${this.hass}
                 .device=${device}

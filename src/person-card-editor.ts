@@ -139,7 +139,7 @@ export class PersonCardEditor extends LitElement {
   // ── Tab: Devices ─────────────────────────────────────────────────────────────
 
   private _renderDevicesTab() {
-    const devices = (this._config.devices ?? []).filter(d => d.name !== '__eta__');
+    const devices = this._config.devices ?? [];
     return html`
       ${devices.map((device, i) => html`
         <div class="device-block">
@@ -203,36 +203,21 @@ export class PersonCardEditor extends LitElement {
     `;
   }
 
-  private _updateDevice(visibleIndex: number, patch: Partial<DeviceConfig>) {
-    // Work on non-__eta__ devices only; preserve the __eta__ sentinel
-    const all = [...(this._config.devices ?? [])];
-    const visibleDevices = all.filter(d => d.name !== '__eta__');
-    const target = visibleDevices[visibleIndex];
-    const allIndex = all.indexOf(target);
-    if (allIndex === -1) return;
-    all[allIndex] = { ...all[allIndex], ...patch };
-    this._set({ devices: all });
+  private _updateDevice(index: number, patch: Partial<DeviceConfig>) {
+    const devices = [...(this._config.devices ?? [])];
+    devices[index] = { ...devices[index], ...patch };
+    this._set({ devices });
   }
 
-  private _removeDevice(visibleIndex: number) {
-    const all = [...(this._config.devices ?? [])];
-    const visibleDevices = all.filter(d => d.name !== '__eta__');
-    const target = visibleDevices[visibleIndex];
-    const allIndex = all.indexOf(target);
-    if (allIndex === -1) return;
-    all.splice(allIndex, 1);
-    this._set({ devices: all });
+  private _removeDevice(index: number) {
+    const devices = [...(this._config.devices ?? [])];
+    devices.splice(index, 1);
+    this._set({ devices });
   }
 
   private _addDevice() {
-    const all = [...(this._config.devices ?? [])];
-    const etaIndex = all.findIndex(d => d.name === '__eta__');
-    if (etaIndex === -1) {
-      all.push({ entity: '' });
-    } else {
-      all.splice(etaIndex, 0, { entity: '' });
-    }
-    this._set({ devices: all });
+    const devices = [...(this._config.devices ?? []), { entity: '' }];
+    this._set({ devices });
   }
 
   // ── Tab: Appearance ───────────────────────────────────────────────────────────
@@ -523,7 +508,6 @@ export class PersonCardEditor extends LitElement {
   // ── Tab: Display ─────────────────────────────────────────────────────────────
 
   private _renderDisplayTab() {
-    const etaEntity = this._config.devices?.find(d => d.name === '__eta__')?.entity ?? '';
     return html`
       <div class="row">
         <ha-formfield label="Show ETA when away">
@@ -538,13 +522,11 @@ export class PersonCardEditor extends LitElement {
         <div>
           <ha-entity-picker
             .hass=${this.hass}
-            .value=${etaEntity}
+            .value=${this._config.eta_entity ?? ''}
             .includeDomains=${['sensor']}
             label="Travel time sensor"
             @value-changed=${(e: CustomEvent) => {
-              const devices = (this._config.devices ?? []).filter(d => d.name !== '__eta__');
-              if (e.detail.value) devices.push({ entity: e.detail.value, name: '__eta__' });
-              this._set({ devices });
+              this._set({ eta_entity: e.detail.value || undefined });
             }}
           ></ha-entity-picker>
         </div>
