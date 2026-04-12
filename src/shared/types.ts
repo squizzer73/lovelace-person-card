@@ -78,3 +78,7 @@ export type SizeTier = 'small' | 'medium' | 'large' | 'hero' | 'stats';
 export type SizeConfig = 'auto' | SizeTier;
 
 export type ConnectivityState = 'online' | 'offline' | 'unknown';
+
+export interface PersonCardThemeConfig {
+  zone_styles: ZoneStyleConfig[];
+}
