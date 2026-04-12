@@ -18,6 +18,7 @@ import { cardStyles } from './styles';
 import { evaluateConditions } from './lib/condition-engine';
 import { shouldShowNotificationBadge } from './lib/ha-helpers';
 import { formatDuration } from './shared/format-utils';
+import { getBatteryColor } from './shared/battery-utils';
 
 // Register sub-components
 import './components/location-badge';
@@ -161,10 +162,7 @@ export class PersonCard extends LitElement {
     const battState = device.battery_entity ? this.hass.states[device.battery_entity] : undefined;
     const battery = battState ? parseFloat(battState.state) : NaN;
     const threshold = device.battery_threshold ?? 20;
-    const battColor = isNaN(battery) ? '#888'
-      : battery <= threshold ? '#f44336'
-      : battery < 50 ? '#ff9800'
-      : '#4caf50';
+    const battColor = isNaN(battery) ? '#888' : getBatteryColor(battery, threshold);
     const connState = device.connectivity_entity ? this.hass.states[device.connectivity_entity] : undefined;
     const isOnline = connState ? connState.state === 'on' : null;
     const icon = device.icon ?? 'mdi:devices';

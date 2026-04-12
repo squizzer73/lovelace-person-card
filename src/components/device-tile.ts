@@ -3,6 +3,7 @@ import { customElement, property } from 'lit/decorators.js';
 import type { DeviceConfig, ConnectivityState } from '../types';
 import { getBatteryLevel, getConnectivity } from '../lib/ha-helpers';
 import type { HomeAssistant } from 'custom-card-helpers';
+import { getBatteryColor } from '../shared/battery-utils';
 
 @customElement('person-card-device-tile')
 export class DeviceTile extends LitElement {
@@ -61,10 +62,7 @@ export class DeviceTile extends LitElement {
   `;
 
   private batteryColor(level: number): string {
-    const threshold = this.device.battery_threshold ?? 20;
-    if (level <= threshold) return '#f44336';
-    if (level < 50) return '#ff9800';
-    return '#4caf50';
+    return getBatteryColor(level, this.device.battery_threshold ?? 20);
   }
 
   render() {
