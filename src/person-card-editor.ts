@@ -1,20 +1,9 @@
 import { LitElement, html, css } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import type { HomeAssistant } from 'custom-card-helpers';
-import type { PersonCardConfig, DeviceConfig, ZoneStyleConfig, ConditionRule, Condition, StyleEffect } from './types';
-
-const COLOR_SCHEMES = [
-  { name: 'Midnight',        bg: '#1c1c2e', border: '#4fc3f7' },
-  { name: 'Forest Walk',     bg: '#1b2e1b', border: '#76c442' },
-  { name: 'Lava Flow',       bg: '#2e1b1b', border: '#ff6d00' },
-  { name: 'Arctic Drift',    bg: '#1a2332', border: '#80deea' },
-  { name: 'Twilight',        bg: '#2e1b3c', border: '#ce93d8' },
-  { name: 'Emerald City',    bg: '#1b2e28', border: '#ffd700' },
-  { name: 'Rose Gold',       bg: '#2e1c24', border: '#f48fb1' },
-  { name: 'Neon Tokyo',      bg: '#120d1f', border: '#e040fb' },
-  { name: 'Desert Night',    bg: '#2e2416', border: '#ffb300' },
-  { name: 'Northern Lights', bg: '#0d1f1a', border: '#69f0ae' },
-] as const;
+import type { PersonCardConfig, DeviceConfig, ConditionRule, Condition, StyleEffect } from './types';
+import { COLOR_SCHEMES } from './shared/constants';
+import './components/zone-editor';
 
 @customElement('person-card-editor')
 export class PersonCardEditor extends LitElement {
@@ -151,7 +140,7 @@ export class PersonCardEditor extends LitElement {
   // ── Tab: Devices ─────────────────────────────────────────────────────────────
 
   private _renderDevicesTab() {
-    const devices = (this._config.devices ?? []).filter(d => d.name !== '__eta__');
+    const devices = this._config.devices ?? [];
     return html`
       ${devices.map((device, i) => html`
         <div class="device-block">
@@ -215,42 +204,26 @@ export class PersonCardEditor extends LitElement {
     `;
   }
 
-  private _updateDevice(visibleIndex: number, patch: Partial<DeviceConfig>) {
-    // Work on non-__eta__ devices only; preserve the __eta__ sentinel
-    const all = [...(this._config.devices ?? [])];
-    const visibleDevices = all.filter(d => d.name !== '__eta__');
-    const target = visibleDevices[visibleIndex];
-    const allIndex = all.indexOf(target);
-    if (allIndex === -1) return;
-    all[allIndex] = { ...all[allIndex], ...patch };
-    this._set({ devices: all });
+  private _updateDevice(index: number, patch: Partial<DeviceConfig>) {
+    const devices = [...(this._config.devices ?? [])];
+    devices[index] = { ...devices[index], ...patch };
+    this._set({ devices });
   }
 
-  private _removeDevice(visibleIndex: number) {
-    const all = [...(this._config.devices ?? [])];
-    const visibleDevices = all.filter(d => d.name !== '__eta__');
-    const target = visibleDevices[visibleIndex];
-    const allIndex = all.indexOf(target);
-    if (allIndex === -1) return;
-    all.splice(allIndex, 1);
-    this._set({ devices: all });
+  private _removeDevice(index: number) {
+    const devices = [...(this._config.devices ?? [])];
+    devices.splice(index, 1);
+    this._set({ devices });
   }
 
   private _addDevice() {
-    const all = [...(this._config.devices ?? [])];
-    const etaIndex = all.findIndex(d => d.name === '__eta__');
-    if (etaIndex === -1) {
-      all.push({ entity: '' });
-    } else {
-      all.splice(etaIndex, 0, { entity: '' });
-    }
-    this._set({ devices: all });
+    const devices = [...(this._config.devices ?? []), { entity: '' }];
+    this._set({ devices });
   }
 
   // ── Tab: Appearance ───────────────────────────────────────────────────────────
 
   private _renderAppearanceTab() {
-    const zoneStyles = this._config.zone_styles ?? [];
     return html`
       <div class="row">
         <label>Card Size</label>
@@ -284,95 +257,13 @@ export class PersonCardEditor extends LitElement {
       </div>
       <div class="row">
         <label>Zone Styles</label>
-        <button class="add-btn" style="margin-bottom:8px" @click=${() => this._autoDetectZones()}>
-          <ha-icon .icon=${'mdi:magnify'}></ha-icon> Auto-detect zones from HA
-        </button>
-        ${zoneStyles.map((zs, i) => html`
-          <div class="zone-block">
-            <div class="device-row">
-              <ha-textfield
-                .value=${zs.zone}
-                label="Zone name"
-                @input=${(e: InputEvent) => this._updateZoneStyle(i, { zone: (e.target as HTMLInputElement).value })}
-              ></ha-textfield>
-              <ha-textfield
-                .value=${zs.label ?? ''}
-                label="Display label"
-                @input=${(e: InputEvent) => this._updateZoneStyle(i, { label: (e.target as HTMLInputElement).value || undefined })}
-              ></ha-textfield>
-              <div style="flex:1;min-width:0">
-                <ha-icon-picker
-                  .value=${zs.icon ?? ''}
-                  label="Icon"
-                  @value-changed=${(e: CustomEvent) => this._updateZoneStyle(i, { icon: e.detail.value || undefined })}
-                ></ha-icon-picker>
-              </div>
-              <button class="delete-btn" @click=${() => this._removeZoneStyle(i)}>
-                <ha-icon .icon=${'mdi:delete'}></ha-icon>
-              </button>
-            </div>
-            <div class="scheme-row">
-              ${COLOR_SCHEMES.map(s => html`
-                <div class="scheme-swatch"
-                  title=${s.name}
-                  style="background:${s.bg};border:3px solid ${s.border}"
-                  @click=${() => this._updateZoneStyle(i, { background_color: s.bg, border_color: s.border })}
-                ></div>
-              `)}
-              <div class="scheme-divider"></div>
-              <div class="color-row">
-                <label style="font-size:0.75rem">BG</label>
-                <input type="color" .value=${zs.background_color ?? '#1c1c2e'}
-                  @input=${(e: InputEvent) => this._updateZoneStyle(i, { background_color: (e.target as HTMLInputElement).value })} />
-              </div>
-              <div class="color-row">
-                <label style="font-size:0.75rem">Border</label>
-                <input type="color" .value=${zs.border_color ?? '#ffffff'}
-                  @input=${(e: InputEvent) => this._updateZoneStyle(i, { border_color: (e.target as HTMLInputElement).value })} />
-              </div>
-            </div>
-          </div>
-        `)}
-        <button class="add-btn" @click=${() => this._addZoneStyle()}>
-          <ha-icon .icon=${'mdi:plus-circle'}></ha-icon> Add Zone Style
-        </button>
+        <person-card-zone-editor
+          .hass=${this.hass}
+          .zoneStyles=${this._config.zone_styles ?? []}
+          @zone-styles-changed=${(e: CustomEvent) => this._set({ zone_styles: e.detail.zoneStyles })}
+        ></person-card-zone-editor>
       </div>
     `;
-  }
-
-  private _updateZoneStyle(index: number, patch: Partial<ZoneStyleConfig>) {
-    const zoneStyles = [...(this._config.zone_styles ?? [])];
-    zoneStyles[index] = { ...zoneStyles[index], ...patch };
-    this._set({ zone_styles: zoneStyles });
-  }
-
-  private _removeZoneStyle(index: number) {
-    const zoneStyles = [...(this._config.zone_styles ?? [])];
-    zoneStyles.splice(index, 1);
-    this._set({ zone_styles: zoneStyles });
-  }
-
-  private _addZoneStyle() {
-    const zoneStyles = [...(this._config.zone_styles ?? []), { zone: '' }];
-    this._set({ zone_styles: zoneStyles });
-  }
-
-  private _autoDetectZones() {
-    if (!this.hass) return;
-    const existing = new Set((this._config.zone_styles ?? []).map(z => z.zone));
-    const detected = Object.entries(this.hass.states)
-      .filter(([id]) => id.startsWith('zone.'))
-      .map(([id, state]) => {
-        const zoneName = id.replace('zone.', '');
-        return {
-          zone: zoneName,
-          label: (state.attributes['friendly_name'] as string | undefined) ?? zoneName,
-          icon: (state.attributes['icon'] as string | undefined) ?? 'mdi:map-marker',
-        };
-      })
-      .filter(z => !existing.has(z.zone));
-    if (detected.length === 0) return;
-    this._set({ zone_styles: [...(this._config.zone_styles ?? []), ...detected] });
   }
 
   // ── Tab: Conditions ───────────────────────────────────────────────────────────
@@ -535,7 +426,6 @@ export class PersonCardEditor extends LitElement {
   // ── Tab: Display ─────────────────────────────────────────────────────────────
 
   private _renderDisplayTab() {
-    const etaEntity = this._config.devices?.find(d => d.name === '__eta__')?.entity ?? '';
     return html`
       <div class="row">
         <ha-formfield label="Show ETA when away">
@@ -550,13 +440,11 @@ export class PersonCardEditor extends LitElement {
         <div>
           <ha-entity-picker
             .hass=${this.hass}
-            .value=${etaEntity}
+            .value=${this._config.eta_entity ?? ''}
             .includeDomains=${['sensor']}
             label="Travel time sensor"
             @value-changed=${(e: CustomEvent) => {
-              const devices = (this._config.devices ?? []).filter(d => d.name !== '__eta__');
-              if (e.detail.value) devices.push({ entity: e.detail.value, name: '__eta__' });
-              this._set({ devices });
+              this._set({ eta_entity: e.detail.value || undefined });
             }}
           ></ha-entity-picker>
         </div>

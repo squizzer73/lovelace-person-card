@@ -7,6 +7,26 @@ Versions follow [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [0.4.0] — 2026-04-13
+
+### Added
+
+- **Family Card** (`family-card`) — multi-person overview card with three density tiers: Compact (one row per person), Mini (device tile grid), and Detailed (expandable rows with full device list, last seen, ETA, and "View full card" link)
+- **Theme Card** (`person-card-theme`) — shared zone colour scheme card; configure zone styles once and all person-card and family-card instances pick them up automatically; renders as a compact dot legend
+- **Shared zone styles** — zone styles set in the theme card are automatically applied to all cards; per-card `zone_styles` overrides the theme
+
+### Changed
+
+- `eta_entity` is now a first-class config field on person-card (replaces the `__eta__` device sentinel hack); old configs auto-migrate transparently
+- Zone editor extracted as a reusable component — same UI in person-card editor, family-card editor, and theme card editor
+
+### Internal
+
+- Extracted shared modules: `src/shared/` — types, constants, format-utils, battery-utils, zone-utils, condition-engine, ha-helpers, theme-registry, eta-migration, family-card-utils
+- Build now produces two files: `dist/person-card.js` and `dist/family-card.js`
+
+---
+
 ## [0.3.0] — 2026-04-10
 
 ### Added

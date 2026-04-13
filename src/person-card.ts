@@ -17,6 +17,10 @@ type RenderParams = {
 import { cardStyles } from './styles';
 import { evaluateConditions } from './lib/condition-engine';
 import { shouldShowNotificationBadge } from './lib/ha-helpers';
+import { formatDuration } from './shared/format-utils';
+import { getBatteryColor } from './shared/battery-utils';
+import { migrateEtaSentinel } from './shared/eta-migration';
+import { resolveZoneStyles, THEME_EVENT } from './shared/theme-registry';
 
 // Register sub-components
 import './components/location-badge';
@@ -25,6 +29,7 @@ import './components/notification-badge';
 import './components/eta-display';
 import './components/last-seen';
 import './person-card-editor';
+import './person-card-theme';
 
 // HACS / HA card registration
 declare global {
@@ -67,7 +72,7 @@ export class PersonCard extends LitElement {
     if (!config.person_entity) {
       throw new Error('person_entity is required');
     }
-    this._config = {
+    this._config = migrateEtaSentinel({
       size: 'auto',
       show_eta: true,
       show_last_seen: true,
@@ -76,7 +81,7 @@ export class PersonCard extends LitElement {
       zone_styles: [],
       conditions: [],
       ...config,
-    };
+    });
     if (this.isConnected) this._setupResizeObserver();
   }
 
@@ -91,12 +96,16 @@ export class PersonCard extends LitElement {
   connectedCallback() {
     super.connectedCallback();
     if (this._config) this._setupResizeObserver();
+    window.addEventListener(THEME_EVENT, this._onThemeUpdated);
   }
 
   disconnectedCallback() {
     super.disconnectedCallback();
     this._resizeObserver?.disconnect();
+    window.removeEventListener(THEME_EVENT, this._onThemeUpdated);
   }
+
+  private _onThemeUpdated = () => { this.requestUpdate(); };
 
   private _setSizeTier(tier: SizeTier) {
     if (this._sizeTier === tier) return;
@@ -133,7 +142,7 @@ export class PersonCard extends LitElement {
     const effect: StyleEffect = this._config.conditions?.length
       ? evaluateConditions(this._config.conditions, this.hass)
       : {};
-    const zoneStyle = this._config.zone_styles?.find(s => s.zone === this._personZone);
+    const zoneStyle = resolveZoneStyles(this._config.zone_styles ?? []).find(s => s.zone === this._personZone);
 
     const bg = effect.background_color ?? zoneStyle?.background_color;
     if (bg) this.style.setProperty('--pc-background', bg);
@@ -155,33 +164,12 @@ export class PersonCard extends LitElement {
     }
   }
 
-  // ── Helpers ────────────────────────────────────────────────────────────────
-
-  /** Format a duration from an ISO timestamp to now as a human-readable string. */
-  private _formatDuration(isoString: string): string {
-    if (!isoString) return '—';
-    const ms = Date.now() - new Date(isoString).getTime();
-    if (ms < 0) return '—';
-    const totalMins = Math.floor(ms / 60_000);
-    if (totalMins < 1) return '< 1m';
-    if (totalMins < 60) return `${totalMins}m`;
-    const hrs = Math.floor(totalMins / 60);
-    const mins = totalMins % 60;
-    if (hrs < 24) return mins > 0 ? `${hrs}h ${mins}m` : `${hrs}h`;
-    const days = Math.floor(hrs / 24);
-    const remainHrs = hrs % 24;
-    return remainHrs > 0 ? `${days}d ${remainHrs}h` : `${days}d`;
-  }
-
   /** Renders a single device as a vertical card for the hero layout. */
   private _renderHeroDevice(device: DeviceConfig) {
     const battState = device.battery_entity ? this.hass.states[device.battery_entity] : undefined;
     const battery = battState ? parseFloat(battState.state) : NaN;
     const threshold = device.battery_threshold ?? 20;
-    const battColor = isNaN(battery) ? '#888'
-      : battery <= threshold ? '#f44336'
-      : battery < 50 ? '#ff9800'
-      : '#4caf50';
+    const battColor = isNaN(battery) ? '#888' : getBatteryColor(battery, threshold);
     const connState = device.connectivity_entity ? this.hass.states[device.connectivity_entity] : undefined;
     const isOnline = connState ? connState.state === 'on' : null;
     const icon = device.icon ?? 'mdi:devices';
@@ -208,13 +196,13 @@ export class PersonCard extends LitElement {
 
   private _renderHero(p: RenderParams) {
     const { name, photo, personState, effect, showBadge, isStale, address, devices } = p;
-    const zoneStyle = this._config.zone_styles?.find(s => s.zone === this._personZone);
+    const zoneStyle = resolveZoneStyles(this._config.zone_styles ?? []).find(s => s.zone === this._personZone);
     const glowColor = effect.border_color ?? zoneStyle?.border_color;
     const avatarStyle = glowColor
       ? `box-shadow: 0 0 0 4px ${glowColor}66, 0 0 32px ${glowColor}44;`
       : 'box-shadow: 0 0 0 4px rgba(255,255,255,0.15), 0 0 20px rgba(255,255,255,0.05);';
     const showLastSeen = !!(this._config.show_last_seen && personState?.last_updated);
-    const visibleDevices = devices.filter(d => d.name !== '__eta__');
+    const visibleDevices = devices;
 
     return html`
       <div class="card-content">
@@ -243,7 +231,7 @@ export class PersonCard extends LitElement {
         <div class="hero-zone">
           <person-card-location-badge
             .zone=${this._personZone}
-            .zoneStyles=${this._config.zone_styles ?? []}
+            .zoneStyles=${resolveZoneStyles(this._config.zone_styles ?? [])}
             .address=${address}
           ></person-card-location-badge>
         </div>
@@ -272,9 +260,9 @@ export class PersonCard extends LitElement {
 
   private _renderStats(p: RenderParams) {
     const { name, photo, personState, effect, showBadge, isStale, address, devices } = p;
-    const zoneSince = personState?.last_changed ? this._formatDuration(personState.last_changed) : '—';
-    const lastSeenAgo = personState?.last_updated ? this._formatDuration(personState.last_updated) : '—';
-    const visibleDevices = devices.filter(d => d.name !== '__eta__');
+    const zoneSince = personState?.last_changed ? formatDuration(personState.last_changed) : '—';
+    const lastSeenAgo = personState?.last_updated ? formatDuration(personState.last_updated) : '—';
+    const visibleDevices = devices;
 
     return html`
       <div class="card-content">
@@ -293,7 +281,7 @@ export class PersonCard extends LitElement {
             <div class="name">${name}</div>
             <person-card-location-badge
               .zone=${this._personZone}
-              .zoneStyles=${this._config.zone_styles ?? []}
+              .zoneStyles=${resolveZoneStyles(this._config.zone_styles ?? [])}
               .address=${address}
             ></person-card-location-badge>
             <div class="stats-since">In zone ${zoneSince}</div>
@@ -360,7 +348,7 @@ export class PersonCard extends LitElement {
     const isLarge = this._sizeTier === 'large';
     const devices = this._config.devices ?? [];
     const lastUpdated = personState?.last_updated ?? '';
-    const etaEntity = this._config.devices?.find(d => d.name === '__eta__')?.entity ?? '';
+    const etaEntity = this._config.eta_entity ?? '';
 
     // Stale/offline indicator
     const isStale = !!(this._config.offline_threshold && this._config.offline_threshold > 0 && personState?.last_updated)
@@ -404,7 +392,7 @@ export class PersonCard extends LitElement {
             <div class="name">${name}</div>
             <person-card-location-badge
               .zone=${this._personZone}
-              .zoneStyles=${this._config.zone_styles ?? []}
+              .zoneStyles=${resolveZoneStyles(this._config.zone_styles ?? [])}
               .address=${address}
             ></person-card-location-badge>
           </div>
@@ -420,7 +408,7 @@ export class PersonCard extends LitElement {
         ${!isSmall && devices.length > 0 ? html`
           <div class="divider"></div>
           <div class="devices">
-            ${devices.filter(d => d.name !== '__eta__').map(device => html`
+            ${devices.map(device => html`
               <person-card-device-tile
                 .hass=${this.hass}
                 .device=${device}
