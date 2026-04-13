@@ -7,6 +7,14 @@ Versions follow [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [0.4.7] — 2026-04-13
+
+### Added
+
+- **Live card picker preview with real entities**: `getStubConfig` now receives the `hass` object and populates the preview with real person entities from the instance. Person Card finds the first `person.*` entity and its associated device trackers + battery sensors. Family Card finds up to 6 `person.*` entities. The card picker / "Add card" dialog will now show a populated preview instead of an empty/placeholder card.
+
+---
+
 ## [0.4.6] — 2026-04-13
 
 ### Fixed

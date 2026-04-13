@@ -38,8 +38,15 @@ export class FamilyCard extends LitElement {
 
   static styles = familyCardStyles;
 
-  static getStubConfig(): FamilyCardConfig {
-    return { people: [], density: 'detailed', show_devices: true, show_last_seen: true, show_notification_badge: true };
+  static getStubConfig(hass?: HomeAssistant): FamilyCardConfig {
+    // Populate the preview with real person entities so the card looks alive
+    const people = hass
+      ? Object.keys(hass.states)
+          .filter(id => id.startsWith('person.'))
+          .slice(0, 6)
+          .map(entity => ({ entity }))
+      : [];
+    return { people, density: 'detailed', show_devices: true, show_last_seen: true, show_notification_badge: true };
   }
 
   static getConfigElement(): HTMLElement {

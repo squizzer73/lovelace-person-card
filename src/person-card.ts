@@ -56,10 +56,31 @@ export class PersonCard extends LitElement {
 
   static styles = cardStyles;
 
-  static getStubConfig(): PersonCardConfig {
+  static getStubConfig(hass?: HomeAssistant): PersonCardConfig {
+    // Pick the first real person entity so the preview card looks populated
+    const personEntity = hass
+      ? Object.keys(hass.states).find(id => id.startsWith('person.'))
+      : undefined;
+
+    // Try to find device_trackers linked to that person and a battery sensor for each
+    const devices: DeviceConfig[] = [];
+    if (hass && personEntity) {
+      const trackers = (hass.states[personEntity]?.attributes?.['source'] as string | undefined)
+        ? [(hass.states[personEntity].attributes['source'] as string)]
+        : Object.keys(hass.states).filter(id => id.startsWith('device_tracker.')).slice(0, 2);
+
+      for (const tracker of trackers) {
+        const deviceName = tracker.split('.')[1];
+        // Look for a matching battery sensor: sensor.<name>_battery or sensor.<name>_battery_level
+        const batteryCandidates = [`sensor.${deviceName}_battery_level`, `sensor.${deviceName}_battery`];
+        const batteryEntity = batteryCandidates.find(id => hass.states[id]);
+        devices.push({ entity: tracker, ...(batteryEntity ? { battery_entity: batteryEntity } : {}) });
+      }
+    }
+
     return {
-      person_entity: 'person.example',
-      devices: [],
+      person_entity: personEntity ?? 'person.example',
+      devices,
       size: 'auto',
       show_eta: true,
       show_last_seen: true,
