@@ -2,7 +2,7 @@
 
 ![Person Card](docs/banner.svg)
 
-A bold, opinionated at-a-glance status card for a person in Home Assistant.
+A suite of bold, at-a-glance Lovelace cards for tracking people in Home Assistant — individual, household, and shared theme in one package.
 
 > **Full GUI editor — no YAML required.**
 
@@ -10,6 +10,14 @@ A bold, opinionated at-a-glance status card for a person in Home Assistant.
 [![HA Version](https://img.shields.io/badge/HA-2023.9%2B-blue.svg)](https://www.home-assistant.io)
 [![Release](https://img.shields.io/github/v/release/squizzer73/lovelace-person-card)](https://github.com/squizzer73/lovelace-person-card/releases/latest)
 [![MIT License](https://img.shields.io/badge/licence-MIT-green.svg)](LICENSE)
+
+### Three cards, one package
+
+| Card | Element | Purpose |
+|------|---------|---------|
+| **Person Card** | `custom:person-card` | Single-person detail card with hero/stats/adaptive layout |
+| **Family Card** | `custom:family-card` | Whole-household overview — compact, mini, or detailed rows |
+| **Theme Card** | `custom:person-card-theme` | Set zone colours once, shared automatically by all cards |
 
 ---
 
@@ -23,6 +31,7 @@ A bold, opinionated at-a-glance status card for a person in Home Assistant.
 
 ## Features
 
+### Person Card
 - **Zone-based location** — hero display with custom icon, label, and colour per zone
 - **Geocoded address** — shows live address when outside all zones (scrolling ticker for long addresses), falls back to "Away"
 - **Per-device status** — battery bar (colour-coded per configurable threshold) and connectivity dot for each tracked device
@@ -38,6 +47,18 @@ A bold, opinionated at-a-glance status card for a person in Home Assistant.
 - **Stats layout** — immersive full-bleed background with in-zone duration and last-seen stat boxes
 - **Adaptive sizing** — `auto` uses ResizeObserver; or pin to `small` / `medium` / `large` / `hero` / `stats`
 - **Tabbed GUI editor** — Person · Devices · Appearance · Conditions · Display
+
+### Family Card
+- **Three density tiers** — Compact (minimal row), Mini (device tile grid), Detailed (expandable rows)
+- **Inline expand** — tap any person row to reveal full device list, last seen, ETA, and "View full card →" link
+- **Group entity support** — point at a HA `group.*` entity and people are auto-discovered
+- **Per-card overrides** — name, photo, ETA sensor, last-seen, notification badge per person
+- **Shared zone colours** — automatically picks up colours from a Theme Card; per-card override if needed
+
+### Theme Card
+- **Configure once, apply everywhere** — set zone styles in one card and every Person Card and Family Card on the dashboard inherits them automatically
+- **Dot legend** — renders as a compact colour-coded zone legend (e.g. `● Home  ● Office  ● Away`)
+- **Per-card override** — any card can still set its own `zone_styles` to override the theme
 
 ---
 
