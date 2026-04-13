@@ -7,6 +7,14 @@ Versions follow [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [0.4.4] — 2026-04-13
+
+### Fixed
+
+- **Zone colours now show even when Family/Person card has its own zone_styles**: if a card has zone_styles saved in its own config (e.g. configured via the Appearance tab in the card editor), those entries previously blocked all theme card colours. `resolveZoneStyles` now merges card-level zone styles with the theme, so any zone missing `border_color`/`background_color` in the card config gets those values from the theme card automatically
+
+---
+
 ## [0.4.3] — 2026-04-13
 
 ### Fixed

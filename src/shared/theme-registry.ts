@@ -25,6 +25,21 @@ export function getTheme(): PersonCardTheme | undefined {
 }
 
 export function resolveZoneStyles(cardZoneStyles: ZoneStyleConfig[]): ZoneStyleConfig[] {
-  if (cardZoneStyles.length > 0) return cardZoneStyles;
-  return getTheme()?.zoneStyles ?? [];
+  const themeStyles = getTheme()?.zoneStyles ?? [];
+  if (cardZoneStyles.length === 0) return themeStyles;
+
+  // Card has its own zone_styles — merge with theme so missing colors are filled from the theme.
+  // Card-level settings win; theme fills gaps (especially border_color / background_color).
+  const themeMap = new Map(themeStyles.map(z => [z.zone, z]));
+  return cardZoneStyles.map(z => {
+    if (z.border_color && z.background_color) return z; // fully configured, no merge needed
+    const themeZ = themeMap.get(z.zone);
+    if (!themeZ) return z; // zone not in theme, nothing to fill
+    return {
+      ...themeZ,           // base: theme defaults
+      ...z,                // card overrides take precedence
+      border_color: z.border_color ?? themeZ.border_color,
+      background_color: z.background_color ?? themeZ.background_color,
+    };
+  });
 }
