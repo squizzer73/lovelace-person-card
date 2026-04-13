@@ -7,6 +7,16 @@ Versions follow [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [0.4.5] — 2026-04-13
+
+### Fixed
+
+- **Root cause of zone colour mismatch identified and fixed**: HA returns the zone's *friendly name* as `person.state` (e.g. `"Uni House"`) rather than the entity-id suffix (`"uni_house"`). Auto-detect was storing entity-id keys so they never matched. Fixed on two fronts:
+  1. `resolveZoneStyle` now tries an exact match first, then a normalised fallback — converting both sides to lowercase entity-id style — so `"Uni House"` matches `"uni_house"` and `"Kerry's"` matches `"kerrys"`. This fixes all existing configs immediately without any user action.
+  2. Auto-detect now stores the zone's friendly name as the zone key (e.g. `Uni House`) so newly detected zones work out of the box. Exception: `zone.home` continues to use `"home"` (HA hard-codes this lowercase state value).
+
+---
+
 ## [0.4.4] — 2026-04-13
 
 ### Fixed

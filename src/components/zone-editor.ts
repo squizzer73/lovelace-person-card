@@ -80,14 +80,18 @@ export class ZoneEditor extends LitElement {
       return z;
     });
 
-    // Add newly detected zones that don't yet exist in the config
+    // Add newly detected zones that don't yet exist in the config.
+    // Use the friendly name as the zone key because HA returns the friendly name
+    // (e.g. "Uni House") as person.state, not the entity-id suffix ("uni_house").
+    // Special case: zone.home always maps to "home" (HA hard-codes this lowercase value).
     const detected = Object.entries(this.hass.states)
       .filter(([id]) => id.startsWith('zone.'))
       .map(([id, state]) => {
-        const zoneName = id.replace('zone.', '');
+        const friendlyName = (state.attributes['friendly_name'] as string | undefined) ?? id.replace('zone.', '');
+        const zoneName = id === 'zone.home' ? 'home' : friendlyName;
         return {
           zone: zoneName,
-          label: (state.attributes['friendly_name'] as string | undefined) ?? zoneName,
+          label: friendlyName,
           icon: (state.attributes['icon'] as string | undefined) ?? 'mdi:map-marker',
         };
       })

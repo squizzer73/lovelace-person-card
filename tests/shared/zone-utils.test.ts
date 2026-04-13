@@ -9,7 +9,7 @@ const zoneStyles: ZoneStyleConfig[] = [
 ];
 
 describe('resolveZoneStyle', () => {
-  it('returns matching zone style', () => {
+  it('returns matching zone style (exact)', () => {
     expect(resolveZoneStyle('home', zoneStyles)).toEqual(zoneStyles[0]);
   });
 
@@ -19,6 +19,27 @@ describe('resolveZoneStyle', () => {
 
   it('returns undefined for empty array', () => {
     expect(resolveZoneStyle('home', [])).toBeUndefined();
+  });
+
+  it('normalised match: "Uni House" finds config with zone "uni_house"', () => {
+    const styles: ZoneStyleConfig[] = [{ zone: 'uni_house', label: 'Uni House', border_color: '#abc' }];
+    expect(resolveZoneStyle('Uni House', styles)).toEqual(styles[0]);
+  });
+
+  it('normalised match: "uni_house" finds config with zone "Uni House"', () => {
+    const styles: ZoneStyleConfig[] = [{ zone: 'Uni House', label: 'Uni House', border_color: '#abc' }];
+    expect(resolveZoneStyle('uni_house', styles)).toEqual(styles[0]);
+  });
+
+  it('normalised match: strips apostrophes — "Kerry\'s" matches "kerrys"', () => {
+    const styles: ZoneStyleConfig[] = [{ zone: 'kerrys', label: "Kerry's", border_color: '#green' }];
+    expect(resolveZoneStyle("Kerry's", styles)).toEqual(styles[0]);
+  });
+
+  it('exact match takes precedence over normalised match', () => {
+    const exact: ZoneStyleConfig = { zone: 'Uni House', border_color: '#exact' };
+    const loose: ZoneStyleConfig = { zone: 'uni_house', border_color: '#loose' };
+    expect(resolveZoneStyle('Uni House', [loose, exact])?.border_color).toBe('#exact');
   });
 });
 
