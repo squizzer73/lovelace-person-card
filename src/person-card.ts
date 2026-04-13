@@ -30,6 +30,7 @@ import './components/eta-display';
 import './components/last-seen';
 import './person-card-editor';
 import './person-card-theme';
+import './family-card';
 
 // HACS / HA card registration
 declare global {
