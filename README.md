@@ -340,6 +340,68 @@ background_image: /local/backgrounds/city.jpg
 
 ---
 
+## Family Card
+
+A multi-person overview card for tracking the whole household at a glance.
+
+```yaml
+type: custom:family-card
+people:
+  - entity: person.mark
+    eta_entity: sensor.marks_travel_time
+  - entity: person.jane
+  - entity: person.sophie
+density: detailed          # compact | mini | detailed
+show_devices: true
+show_last_seen: true
+offline_threshold: 30
+```
+
+Three density tiers:
+- **Compact** — one row per person: avatar, name, zone badge, status dot
+- **Mini** — tile grid per person with device battery bars
+- **Detailed** — expandable rows; tap to see full device list, last seen, ETA, and "View full card" link
+
+Alternatively, point at a HA group entity and people are auto-discovered:
+
+```yaml
+type: custom:family-card
+group_entity: group.family
+density: detailed
+```
+
+Add `family-card.js` as a second Dashboard resource:
+**Settings → Dashboards → Resources** → `/local/community/lovelace-person-card/family-card.js`
+
+---
+
+## Theme Card
+
+Configure zone colours once and share them across all person-card and family-card instances.
+
+```yaml
+type: custom:person-card-theme
+zone_styles:
+  - zone: home
+    label: Home
+    icon: mdi:home
+    background_color: "#1b2e1b"
+    border_color: "#76c442"
+  - zone: work
+    label: Office
+    icon: mdi:briefcase
+    background_color: "#1a2332"
+    border_color: "#80deea"
+  - zone: not_home
+    label: Away
+    icon: mdi:map-marker-off
+    border_color: "#ff6d00"
+```
+
+Renders as a compact dot legend — `● Home  ● Office  ● Away` — using each zone's border colour. Place it anywhere on the dashboard; all cards on the same page pick it up automatically. Per-card `zone_styles` overrides the theme if set.
+
+---
+
 ## Development
 
 ```bash
