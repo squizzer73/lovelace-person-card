@@ -66,7 +66,21 @@ export class ZoneEditor extends LitElement {
 
   private _autoDetect() {
     if (!this.hass) return;
-    const existing = new Set(this.zoneStyles.map(z => z.zone));
+    const existingMap = new Map(this.zoneStyles.map((z, i) => [z.zone, i]));
+
+    // Backfill colours for existing zones that are missing them
+    let updated = [...this.zoneStyles];
+    let colorIndex = 0;
+    updated = updated.map((z, i) => {
+      if (!z.border_color) {
+        const scheme = COLOR_SCHEMES[(i + colorIndex) % COLOR_SCHEMES.length];
+        colorIndex++;
+        return { ...z, background_color: z.background_color ?? scheme.bg, border_color: scheme.border };
+      }
+      return z;
+    });
+
+    // Add newly detected zones that don't yet exist in the config
     const detected = Object.entries(this.hass.states)
       .filter(([id]) => id.startsWith('zone.'))
       .map(([id, state]) => {
@@ -77,15 +91,19 @@ export class ZoneEditor extends LitElement {
           icon: (state.attributes['icon'] as string | undefined) ?? 'mdi:map-marker',
         };
       })
-      .filter(z => !existing.has(z.zone));
-    if (detected.length === 0) return;
-    // Assign a colour scheme to each new zone, cycling through the palette
-    const startIndex = this.zoneStyles.length;
-    const detectedWithColors = detected.map((z, i) => {
-      const scheme = COLOR_SCHEMES[(startIndex + i) % COLOR_SCHEMES.length];
-      return { ...z, background_color: scheme.bg, border_color: scheme.border };
-    });
-    this._fire([...this.zoneStyles, ...detectedWithColors]);
+      .filter(z => !existingMap.has(z.zone));
+
+    if (detected.length > 0) {
+      // Assign a colour scheme to each new zone, cycling through the palette
+      const startIndex = updated.length;
+      const detectedWithColors = detected.map((z, i) => {
+        const scheme = COLOR_SCHEMES[(startIndex + i) % COLOR_SCHEMES.length];
+        return { ...z, background_color: scheme.bg, border_color: scheme.border };
+      });
+      updated = [...updated, ...detectedWithColors];
+    }
+
+    this._fire(updated);
   }
 
   render() {

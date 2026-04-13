@@ -7,6 +7,14 @@ Versions follow [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [0.4.3] — 2026-04-13
+
+### Fixed
+
+- **Zone auto-detect backfills missing colours**: clicking "Auto-detect zones from HA" now also assigns colour schemes to any existing zones in the config that were previously detected without colours (e.g. zones added before v0.4.2); no need to delete and re-add zones manually
+
+---
+
 ## [0.4.2] — 2026-04-13
 
 ### Fixed
