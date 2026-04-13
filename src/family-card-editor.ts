@@ -62,11 +62,13 @@ export class FamilyCardEditor extends LitElement {
       </div>
       <div class="row">
         <label>Group Entity (optional — overridden by people list)</label>
-        <ha-entity-picker
-          .hass=${this.hass}
-          .value=${this._config.group_entity ?? ''}
-          @value-changed=${(e: CustomEvent) => this._set({ group_entity: e.detail.value || undefined })}
-        ></ha-entity-picker>
+        <div>
+          <ha-entity-picker
+            .hass=${this.hass}
+            .value=${this._config.group_entity ?? ''}
+            @value-changed=${(e: CustomEvent) => this._set({ group_entity: e.detail.value || undefined })}
+          ></ha-entity-picker>
+        </div>
       </div>
       <div class="row">
         <label>People</label>
@@ -78,14 +80,16 @@ export class FamilyCardEditor extends LitElement {
                 const updated = [...people]; updated.splice(i, 1); this._set({ people: updated });
               }}><ha-icon .icon=${'mdi:delete'}></ha-icon></button>
             </div>
-            <ha-entity-picker
-              .hass=${this.hass}
-              .value=${person.entity}
-              .includeDomains=${['person']}
-              @value-changed=${(e: CustomEvent) => {
-                const updated = [...people]; updated[i] = { ...updated[i], entity: e.detail.value }; this._set({ people: updated });
-              }}
-            ></ha-entity-picker>
+            <div>
+              <ha-entity-picker
+                .hass=${this.hass}
+                .value=${person.entity ?? ''}
+                .includeDomains=${['person']}
+                @value-changed=${(e: CustomEvent) => {
+                  const updated = [...people]; updated[i] = { ...updated[i], entity: e.detail.value }; this._set({ people: updated });
+                }}
+              ></ha-entity-picker>
+            </div>
             <div class="detail-row">
               <ha-textfield
                 .value=${person.name ?? ''}
@@ -98,17 +102,19 @@ export class FamilyCardEditor extends LitElement {
               ></ha-textfield>
             </div>
             <div class="detail-row">
-              <ha-entity-picker
-                .hass=${this.hass}
-                .value=${person.eta_entity ?? ''}
-                .includeDomains=${['sensor']}
-                label="ETA travel time sensor (optional)"
-                @value-changed=${(e: CustomEvent) => {
-                  const updated = [...people];
-                  updated[i] = { ...updated[i], eta_entity: e.detail.value || undefined };
-                  this._set({ people: updated });
-                }}
-              ></ha-entity-picker>
+              <div>
+                <ha-entity-picker
+                  .hass=${this.hass}
+                  .value=${person.eta_entity ?? ''}
+                  .includeDomains=${['sensor']}
+                  label="ETA travel time sensor (optional)"
+                  @value-changed=${(e: CustomEvent) => {
+                    const updated = [...people];
+                    updated[i] = { ...updated[i], eta_entity: e.detail.value || undefined };
+                    this._set({ people: updated });
+                  }}
+                ></ha-entity-picker>
+              </div>
             </div>
           </div>
         `)}
@@ -166,12 +172,14 @@ export class FamilyCardEditor extends LitElement {
             </button>
           </div>
           ${rule.conditions.map((cond, ci) => html`
-            <ha-entity-picker .hass=${this.hass} .value=${cond.entity} label="Entity"
-              style="display:block;width:100%;margin-bottom:4px"
-              @value-changed=${(e: CustomEvent) => {
-                const r = [...rules]; const conds = [...r[ri].conditions];
-                conds[ci] = { ...conds[ci], entity: e.detail.value }; r[ri] = { ...r[ri], conditions: conds }; this._set({ conditions: r });
-              }}></ha-entity-picker>
+            <div style="margin-bottom:4px">
+              <ha-entity-picker .hass=${this.hass} .value=${cond.entity ?? ''} label="Entity"
+                style="display:block;width:100%"
+                @value-changed=${(e: CustomEvent) => {
+                  const r = [...rules]; const conds = [...r[ri].conditions];
+                  conds[ci] = { ...conds[ci], entity: e.detail.value }; r[ri] = { ...r[ri], conditions: conds }; this._set({ conditions: r });
+                }}></ha-entity-picker>
+            </div>
             <div class="condition-row">
               <ha-textfield .value=${cond.attribute ?? ''} label="Attribute (opt.)"
                 @input=${(e: InputEvent) => {
@@ -273,7 +281,7 @@ export class FamilyCardEditor extends LitElement {
   }
 
   render() {
-    if (!this._config) return html``;
+    if (!this._config || !this.hass) return html``;
     type Tab = 'people' | 'appearance' | 'conditions' | 'display';
     const tabs: Array<{ key: Tab; label: string }> = [
       { key: 'people', label: 'People' },

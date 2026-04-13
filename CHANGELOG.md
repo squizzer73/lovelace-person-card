@@ -7,6 +7,23 @@ Versions follow [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [0.4.2] — 2026-04-13
+
+### Fixed
+
+- **Family Card editor — entity pickers now interactive**: entity picker fields in the Family Card GUI editor (People tab person/ETA entity, Conditions tab) were rendering but not responding to clicks; fixed by matching the same `<div>` wrapper pattern applied to Person Card editor in v0.3.x
+- **Zone auto-detect now assigns colours**: the "Auto-detect zones from HA" button in the zone editor previously set zone name, label, and icon but left `border_color` unset, so auto-detected zones showed no accent colour in cards; auto-detect now cycles through the 10 built-in colour schemes and assigns one to each new zone automatically
+
+---
+
+## [0.4.1] — 2026-04-13
+
+### Fixed
+
+- **Family Card and Theme Card now available in Home Assistant via HACS**: HACS installs only the single file listed in `hacs.json`; bundled family-card and person-card-theme into `person-card.js` via side-effect imports so all three cards are registered from the one file
+
+---
+
 ## [0.4.0] — 2026-04-13
 
 ### Added

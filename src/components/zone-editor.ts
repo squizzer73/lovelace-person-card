@@ -79,7 +79,13 @@ export class ZoneEditor extends LitElement {
       })
       .filter(z => !existing.has(z.zone));
     if (detected.length === 0) return;
-    this._fire([...this.zoneStyles, ...detected]);
+    // Assign a colour scheme to each new zone, cycling through the palette
+    const startIndex = this.zoneStyles.length;
+    const detectedWithColors = detected.map((z, i) => {
+      const scheme = COLOR_SCHEMES[(startIndex + i) % COLOR_SCHEMES.length];
+      return { ...z, background_color: scheme.bg, border_color: scheme.border };
+    });
+    this._fire([...this.zoneStyles, ...detectedWithColors]);
   }
 
   render() {
