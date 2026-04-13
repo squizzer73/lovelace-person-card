@@ -500,7 +500,7 @@ export class PersonCardEditor extends LitElement {
   }
 
   render() {
-    if (!this._config) return html``;
+    if (!this._config || !this.hass) return html``;
 
     type TabKey = 'person' | 'devices' | 'appearance' | 'conditions' | 'display';
     const tabs: Array<{ key: TabKey; label: string }> = [

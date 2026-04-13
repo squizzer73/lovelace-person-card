@@ -7,6 +7,14 @@ Versions follow [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [0.4.6] — 2026-04-13
+
+### Fixed
+
+- **Person Card editor — entity picker non-interactive when editing existing card**: opening the editor on a card that already had a person entity set rendered the picker with a value but without `hass`, causing it to initialise in a broken state. Added `!this.hass` guard to `render()` so the editor waits until both config and hass are available before rendering (same pattern already applied to Family Card editor in v0.4.2)
+
+---
+
 ## [0.4.5] — 2026-04-13
 
 ### Fixed
