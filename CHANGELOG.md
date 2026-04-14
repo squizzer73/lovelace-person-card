@@ -7,6 +7,18 @@ Versions follow [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [0.5.1] — 2026-04-14
+
+### Added
+
+- **Family Card: zone summary bar** (`show_summary: true`) — a compact bar above the rows showing a coloured dot, count, and zone label for every zone that has at least one person in it. Home appears first, remaining zones ordered by occupancy descending. Toggle via the Display tab in the card editor.
+
+- **Family Card: group by zone** (`group_by_zone: true`) — people are clustered under a coloured zone group header (icon · name · count badge) rather than displayed in a flat list. Home group appears first, then other zones by occupancy. Works across all three density modes (detailed, compact, mini). Toggle via the Display tab in the card editor.
+
+Both features are off by default and independent — you can use either or both together.
+
+---
+
 ## [0.5.0] — 2026-04-14
 
 ### Added

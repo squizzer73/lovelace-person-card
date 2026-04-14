@@ -9,7 +9,7 @@ import { resolveZoneStyles, THEME_EVENT } from './shared/theme-registry';
 import { evaluateConditions } from './shared/condition-engine';
 import { getBatteryLevel, getConnectivity, shouldShowNotificationBadge } from './shared/ha-helpers';
 import { formatDuration } from './shared/format-utils';
-import { resolveZoneStyle } from './shared/zone-utils';
+import { resolveZoneStyle, getZoneLabel, getZoneIcon } from './shared/zone-utils';
 import './components/device-tile';
 import './components/location-badge';
 import './components/notification-badge';
@@ -219,21 +219,115 @@ export class FamilyCard extends LitElement {
     `;
   }
 
+  // ── Summary & grouping helpers ───────────────────────────────────────────
+
+  /** People sorted into zone buckets: home first, then by occupancy desc. */
+  private _getZoneGroups(people: FamilyPersonConfig[]): Array<{ zone: string; people: FamilyPersonConfig[] }> {
+    const map = new Map<string, FamilyPersonConfig[]>();
+    for (const p of people) {
+      const z = this._getPersonZone(p);
+      if (!map.has(z)) map.set(z, []);
+      map.get(z)!.push(p);
+    }
+    return Array.from(map.entries())
+      .sort(([zA, pA], [zB, pB]) => {
+        const nA = zA.toLowerCase().replace(/\s+/g, '_');
+        const nB = zB.toLowerCase().replace(/\s+/g, '_');
+        if (nA === 'home') return -1;
+        if (nB === 'home') return 1;
+        return pB.length - pA.length;
+      })
+      .map(([zone, people]) => ({ zone, people }));
+  }
+
+  private _renderSummary(people: FamilyPersonConfig[]) {
+    const zoneStyles = this._zoneStyles();
+    const counts = new Map<string, number>();
+    for (const p of people) {
+      const z = this._getPersonZone(p);
+      counts.set(z, (counts.get(z) ?? 0) + 1);
+    }
+    const items = Array.from(counts.entries())
+      .sort(([zA], [zB]) => {
+        const nA = zA.toLowerCase().replace(/\s+/g, '_');
+        const nB = zB.toLowerCase().replace(/\s+/g, '_');
+        if (nA === 'home') return -1;
+        if (nB === 'home') return 1;
+        return counts.get(zB)! - counts.get(zA)!;
+      });
+
+    return html`
+      <div class="summary-bar">
+        ${items.map(([zone, count]) => {
+          const style = resolveZoneStyle(zone, zoneStyles);
+          const color = style?.border_color ?? 'rgba(255,255,255,0.3)';
+          const label = getZoneLabel(zone, zoneStyles);
+          return html`
+            <div class="summary-item">
+              <div class="summary-dot"
+                style="background:${color};box-shadow:0 0 5px ${color}88">
+              </div>
+              <span class="summary-count">${count}</span>
+              <span class="summary-label">${label}</span>
+            </div>
+          `;
+        })}
+      </div>
+    `;
+  }
+
+  private _renderZoneGroup(zone: string, groupPeople: FamilyPersonConfig[], density: string) {
+    const zoneStyles = this._zoneStyles();
+    const style = resolveZoneStyle(zone, zoneStyles);
+    const color = style?.border_color ?? 'rgba(255,255,255,0.2)';
+    const icon = getZoneIcon(zone, zoneStyles);
+    const label = getZoneLabel(zone, zoneStyles);
+    const isMini = density === 'mini';
+
+    return html`
+      <div class="zone-group">
+        <div class="zone-group-header" style="--group-accent:${color}">
+          <ha-icon class="group-icon" .icon=${icon} style="color:${color}"></ha-icon>
+          <span class="group-label">${label}</span>
+          <span class="group-count">${groupPeople.length}</span>
+        </div>
+        <div class="person-rows ${isMini ? 'mini-grid' : ''}">
+          ${groupPeople.map(p => this._renderRow(p, density))}
+        </div>
+      </div>
+    `;
+  }
+
+  private _renderRow(person: FamilyPersonConfig, density: string) {
+    if (density === 'compact') return this._renderCompactRow(person);
+    if (density === 'mini') return this._renderMiniRow(person);
+    return this._renderDetailedRow(person);
+  }
+
+  // ── Main render ───────────────────────────────────────────────────────────
+
   render() {
     if (!this._config || !this.hass) return html``;
     const people = resolvePersonConfig(this.hass, this._config);
     const density = this._config.density ?? 'detailed';
+    const groupByZone = this._config.group_by_zone ?? false;
+    const showSummary = this._config.show_summary ?? false;
+    const isMini = density === 'mini';
+
+    const body = groupByZone
+      ? html`${this._getZoneGroups(people).map(({ zone, people: gp }) =>
+          this._renderZoneGroup(zone, gp, density))}`
+      : html`
+          <div class="person-rows ${isMini ? 'mini-grid' : ''}">
+            ${people.map(p => this._renderRow(p, density))}
+          </div>
+        `;
 
     return html`
       <div class="card-content">
         ${this._config.background_image ? html`<div class="card-background"></div>` : ''}
-        <div class="person-rows">
-          ${people.map(person => {
-            if (density === 'compact') return this._renderCompactRow(person);
-            if (density === 'mini') return this._renderMiniRow(person);
-            return this._renderDetailedRow(person);
-          })}
-        </div>
+        ${showSummary ? this._renderSummary(people) : ''}
+        ${body}
       </div>
     `;
   }

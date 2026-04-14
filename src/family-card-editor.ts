@@ -251,6 +251,14 @@ export class FamilyCardEditor extends LitElement {
 
   private _renderDisplayTab() {
     return html`
+      <div class="row"><ha-formfield label="Group people by zone">
+        <ha-switch .checked=${this._config.group_by_zone === true}
+          @change=${(e: Event) => this._set({ group_by_zone: (e.target as HTMLInputElement).checked })}></ha-switch>
+      </ha-formfield></div>
+      <div class="row"><ha-formfield label="Show zone summary">
+        <ha-switch .checked=${this._config.show_summary === true}
+          @change=${(e: Event) => this._set({ show_summary: (e.target as HTMLInputElement).checked })}></ha-switch>
+      </ha-formfield></div>
       <div class="row"><ha-formfield label="Show devices">
         <ha-switch .checked=${this._config.show_devices !== false}
           @change=${(e: Event) => this._set({ show_devices: (e.target as HTMLInputElement).checked })}></ha-switch>

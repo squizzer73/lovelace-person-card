@@ -106,6 +106,8 @@ export interface FamilyCardConfig {
   people?: FamilyPersonConfig[];
   group_entity?: string;
   density?: FamilyCardDensity;
+  group_by_zone?: boolean;
+  show_summary?: boolean;
   show_devices?: boolean;
   show_last_seen?: boolean;
   show_eta?: boolean;

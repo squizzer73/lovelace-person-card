@@ -23,19 +23,83 @@ export const familyCardStyles = css`
 
   .card-content { position: relative; z-index: 1; padding: 12px 14px; }
 
-  .card-header {
-    display: flex; align-items: center; gap: 8px;
-    margin-bottom: 10px; padding-bottom: 8px;
+  /* ── Summary bar ─────────────────────────────────────── */
+  .summary-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 14px;
+    padding-bottom: 10px;
+    margin-bottom: 6px;
     border-bottom: 1px solid rgba(255,255,255,0.08);
   }
 
-  .card-title {
-    flex: 1; font-size: 0.85rem; font-weight: 700;
-    letter-spacing: 0.04em; color: rgba(255,255,255,0.6);
-    text-transform: uppercase;
+  .summary-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
   }
 
-  /* Person row — all tiers */
+  .summary-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .summary-count {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: rgba(255,255,255,0.9);
+  }
+
+  .summary-label {
+    font-size: 0.75rem;
+    color: rgba(255,255,255,0.45);
+    white-space: nowrap;
+  }
+
+  /* ── Zone group header ───────────────────────────────── */
+  .zone-group {
+    margin-bottom: 4px;
+  }
+
+  .zone-group + .zone-group {
+    margin-top: 10px;
+  }
+
+  .zone-group-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 2px 4px;
+    margin-bottom: 4px;
+    border-bottom: 1px solid var(--group-accent, rgba(255,255,255,0.1));
+  }
+
+  .group-icon {
+    --mdc-icon-size: 13px;
+    flex-shrink: 0;
+  }
+
+  .group-label {
+    flex: 1;
+    font-size: 0.66rem;
+    font-weight: 700;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.45);
+  }
+
+  .group-count {
+    font-size: 0.66rem;
+    font-weight: 700;
+    color: rgba(255,255,255,0.3);
+    background: rgba(255,255,255,0.07);
+    border-radius: 8px;
+    padding: 1px 6px;
+  }
+
+  /* ── Person row — all tiers ──────────────────────────── */
   .person-row {
     border-radius: 10px;
     margin-bottom: 6px;
@@ -63,7 +127,6 @@ export const familyCardStyles = css`
   .avatar-placeholder ha-icon { --mdc-icon-size: 18px; color: rgba(255,255,255,0.4); }
   .avatar.stale, .avatar-placeholder.stale { opacity: 0.55; filter: grayscale(60%); }
 
-  /* compact tier */
   :host([density='compact']) .avatar,
   :host([density='compact']) .avatar-placeholder { width: 32px; height: 32px; }
 
@@ -81,7 +144,7 @@ export const familyCardStyles = css`
   .chevron { color: rgba(255,255,255,0.3); font-size: 0.75rem; flex-shrink: 0; transition: transform 0.2s; }
   .chevron.open { transform: rotate(180deg); }
 
-  /* Expanded panel */
+  /* ── Expanded panel ──────────────────────────────────── */
   .expanded-panel {
     padding: 0 10px 10px 10px;
     margin-left: 46px;
@@ -104,11 +167,11 @@ export const familyCardStyles = css`
     text-decoration: none;
   }
 
-  /* mini tier grid */
-  :host([density='mini']) .card-content > .person-rows {
+  /* ── Mini tier grid ──────────────────────────────────── */
+  .person-rows.mini-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
     gap: 8px;
   }
-  :host([density='mini']) .person-row { margin-bottom: 0; }
+  .person-rows.mini-grid .person-row { margin-bottom: 0; }
 `;
