@@ -1,6 +1,6 @@
 {
   "name": "lovelace-person-card",
-  "version": "0.4.7",
+  "version": "0.5.0",
   "description": "A bold Home Assistant person status card for HACS",
   "type": "module",
   "scripts": {

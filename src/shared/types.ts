@@ -79,8 +79,11 @@ export type SizeConfig = 'auto' | SizeTier;
 
 export type ConnectivityState = 'online' | 'offline' | 'unknown';
 
+export type ThemeCardDisplayStyle = 'legend' | 'compact' | 'pills' | 'list' | 'grid' | 'hidden';
+
 export interface PersonCardThemeConfig {
   zone_styles: ZoneStyleConfig[];
+  display_style?: ThemeCardDisplayStyle;
 }
 
 export type FamilyCardDensity = 'compact' | 'mini' | 'detailed';

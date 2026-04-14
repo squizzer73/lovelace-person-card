@@ -7,6 +7,20 @@ Versions follow [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [0.5.0] — 2026-04-14
+
+### Added
+
+- **Theme Card display styles**: new `display_style` config option with six choices, selectable via a visual button grid in the card editor:
+  - `legend` *(default)* — coloured dots + labels in a wrapping row (existing behaviour)
+  - `compact` — smaller dots and tighter spacing for crowded dashboards
+  - `pills` — filled pill/badge tags using each zone's background and border colour
+  - `list` — vertical list with colour swatch, zone icon, and label; best for many zones
+  - `grid` — zone icon tiles in a responsive auto-fill grid with colour accents
+  - `hidden` — card takes no space and has no visual output; purely provides the shared zone theme to Person Cards and Family Cards on the same dashboard
+
+---
+
 ## [0.4.7] — 2026-04-13
 
 ### Added
