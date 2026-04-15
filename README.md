@@ -2,7 +2,7 @@
 
 ![Person Card](docs/banner.svg)
 
-A suite of bold, at-a-glance Lovelace cards for tracking people in Home Assistant — individual, household, and shared theme in one package.
+A suite of bold, at-a-glance Lovelace cards for tracking people in Home Assistant — individual detail, household overview, and shared zone theme in one package.
 
 > **Full GUI editor — no YAML required.**
 
@@ -15,50 +15,395 @@ A suite of bold, at-a-glance Lovelace cards for tracking people in Home Assistan
 
 | Card | Element | Purpose |
 |------|---------|---------|
-| **Person Card** | `custom:person-card` | Single-person detail card with hero/stats/adaptive layout |
-| **Family Card** | `custom:family-card` | Whole-household overview — compact, mini, or detailed rows |
-| **Theme Card** | `custom:person-card-theme` | Set zone colours once, shared automatically by all cards |
+| **Person Card** | `custom:person-card` | Single-person detail card — small, medium, large, hero, and stats layouts |
+| **Family Card** | `custom:family-card` | Whole-household overview with compact, mini, and detailed density modes |
+| **Theme Card** | `custom:person-card-theme` | Set zone colours once; every Person Card and Family Card on the dashboard inherits them automatically |
 
 ---
 
-## Screenshots
+## Person Card
+
+A single-person status card with five size tiers, zone-coloured styling, per-device battery tracking, condition rules, and more.
+
+### Size Tiers
+
+#### Small · Medium · Large
 
 | Small | Medium | Large |
 |-------|--------|-------|
-| ![Small](docs/screenshots/small.png) | ![Medium](docs/screenshots/medium.png) | ![Large](docs/screenshots/large.png) |
+| ![Small](docs/screenshots/person-card-small.png) | ![Medium](docs/screenshots/person-card-medium.png) | ![Large](docs/screenshots/person-card-large.png) |
+
+- **Small** — Avatar, name, and zone badge only. Ideal in a narrow sidebar column.
+- **Medium** — Adds device battery bars and connectivity dots.
+- **Large** — Adds last-seen timestamp and ETA travel time sensor.
+
+In `auto` mode (default) the tier updates live via ResizeObserver as the column width changes.
+
+#### Hero
+
+A centred, portrait-style layout designed for a prominent feature card.
+
+![Hero](docs/screenshots/person-card-hero.png)
+
+- 120 px avatar with a zone-coloured **glow ring**
+- Name in large bold type, zone badge centred below
+- Horizontal device icon grid — icon, name, battery bar, and connectivity dot per device
+- Last-seen footer and notification badge
+
+#### Stats
+
+An immersive, data-rich layout with a full-bleed background image and presence statistics.
+
+![Stats](docs/screenshots/person-card-stats.png)
+
+- Background image at 55 % opacity
+- "In zone X" sub-label showing how long the person has been in their current zone
+- Two stat boxes: *In zone* duration and *Last seen*
+- Full device list in a frosted-glass panel
 
 ---
 
-## Features
+### Person Card Features
 
-### Person Card
-- **Zone-based location** — hero display with custom icon, label, and colour per zone
-- **Geocoded address** — shows live address when outside all zones (scrolling ticker for long addresses), falls back to "Away"
-- **Per-device status** — battery bar (colour-coded per configurable threshold) and connectivity dot for each tracked device
-- **Configurable battery threshold** — set a low-battery warning level per device (default 20 %); bar turns red and badge triggers at this level
-- **Zone auto-detect** — one-click button reads all `zone.*` entities from HA and pre-populates zone styles automatically
-- **Offline/stale indicator** — avatar dims and a clock badge appears when the person entity hasn't updated within a configurable window
-- **Condition rule builder** — change card background, border, and notification badge based on any HA entity state
+- **Zone-based styling** — custom background colour, border, icon, and label per zone
+- **Zone auto-detect** — one-click button reads all `zone.*` entities from HA and pre-fills the zone list
+- **Geocoded address** — shows a live address when outside all zones (scrolling ticker for long strings); falls back to "Away"
+- **Per-device status** — battery bar (colour-coded) and connectivity dot for every tracked device
+- **Configurable battery threshold** — set a low-battery warning level per device (default 20 %); bar turns red and badge triggers at or below this level
+- **Offline / stale indicator** — avatar dims and a clock badge appears when the person entity hasn't updated within a configurable window
+- **Condition rule builder** — change card background, border, and notification badge based on any HA entity state (AND/OR; last-match-wins)
+- **ETA display** — travel time sensor shown when the person is away (large size)
+- **Last seen timestamp** — relative format, auto-refreshes every 60 s
+- **Notification badge** — auto-triggers on low battery; fully overridable via condition rules
 - **10 built-in colour schemes** — one-click presets plus full custom colour override
-- **ETA display** — shows travel time sensor when the person is away (large size)
-- **Last seen timestamp** — relative or absolute, auto-refreshes every 60 s
-- **Notification badge** — auto-triggers on low battery or offline device, or via condition rules
-- **Hero layout** — centred portrait with 120 px avatar, zone-coloured glow ring, and horizontal device icon grid
-- **Stats layout** — immersive full-bleed background with in-zone duration and last-seen stat boxes
-- **Adaptive sizing** — `auto` uses ResizeObserver; or pin to `small` / `medium` / `large` / `hero` / `stats`
-- **Tabbed GUI editor** — Person · Devices · Appearance · Conditions · Display
+- **Background image** — 25 % opacity overlay (55 % on `stats`)
+- **Adaptive sizing** — `auto` (ResizeObserver), or pin to `small` / `medium` / `large` / `hero` / `stats`
+- **Full GUI editor** — 5 tabs: Person · Devices · Appearance · Conditions · Display
 
-### Family Card
-- **Three density tiers** — Compact (minimal row), Mini (device tile grid), Detailed (expandable rows)
-- **Inline expand** — tap any person row to reveal full device list, last seen, ETA, and "View full card →" link
-- **Group entity support** — point at a HA `group.*` entity and people are auto-discovered
-- **Per-card overrides** — name, photo, ETA sensor, last-seen, notification badge per person
-- **Shared zone colours** — automatically picks up colours from a Theme Card; per-card override if needed
+---
 
-### Theme Card
-- **Configure once, apply everywhere** — set zone styles in one card and every Person Card and Family Card on the dashboard inherits them automatically
-- **Dot legend** — renders as a compact colour-coded zone legend (e.g. `● Home  ● Office  ● Away`)
-- **Per-card override** — any card can still set its own `zone_styles` to override the theme
+### Person Card Configuration
+
+#### Minimal
+
+```yaml
+type: custom:person-card
+person_entity: person.mark
+```
+
+#### Full example
+
+```yaml
+type: custom:person-card
+person_entity: person.mark
+name: Mark                          # optional — overrides entity friendly name
+photo: /local/mark.jpg              # optional — overrides entity picture
+size: auto                          # auto | small | medium | large | hero | stats
+show_eta: true
+show_last_seen: true
+show_notification_badge: true
+address_entity: sensor.marks_phone_geocoded_location
+offline_threshold: 30               # minutes; 0 or omit to disable
+
+background_image: /local/backgrounds/city.jpg
+
+zone_styles:
+  - zone: home
+    label: Home
+    icon: mdi:home
+    background_color: "#1b2e1b"
+    border_color: "#76c442"
+  - zone: Work
+    label: Office
+    icon: mdi:briefcase
+    background_color: "#1a2332"
+    border_color: "#80deea"
+  - zone: not_home
+    label: Away
+    icon: mdi:map-marker-off
+
+devices:
+  - entity: device_tracker.marks_iphone
+    name: iPhone
+    icon: mdi:cellphone
+    battery_entity: sensor.marks_iphone_battery
+    connectivity_entity: binary_sensor.marks_iphone_connected
+    battery_threshold: 25
+  - entity: device_tracker.marks_ipad
+    name: iPad
+    icon: mdi:tablet
+    battery_entity: sensor.marks_ipad_battery
+    battery_threshold: 15
+
+conditions:
+  - id: low-battery-alert
+    label: Low battery alert
+    operator: or
+    conditions:
+      - entity: sensor.marks_iphone_battery
+        operator: lte
+        value: 20
+    effect:
+      border_color: "#f44336"
+      border_width: 2
+      badge_color: "#f44336"
+      badge_icon: mdi:battery-alert
+```
+
+#### Card options
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| `person_entity` | string | **required** | `person.*` entity ID |
+| `name` | string | entity friendly name | Override display name |
+| `photo` | string | entity picture | Override avatar URL |
+| `size` | `auto` \| `small` \| `medium` \| `large` \| `hero` \| `stats` | `auto` | Card size tier |
+| `show_eta` | boolean | `true` | Show ETA footer (large only) |
+| `show_last_seen` | boolean | `true` | Show last seen timestamp (large and hero) |
+| `show_notification_badge` | boolean | `true` | Enable notification badge |
+| `address_entity` | string | — | Sensor with geocoded address string |
+| `offline_threshold` | number | — | Minutes without update before avatar is marked stale; `0` or omit to disable |
+| `background_image` | string | — | URL for card background image |
+| `zone_styles` | list | `[]` | Per-zone colour/icon overrides (see below) |
+| `conditions` | list | `[]` | Condition rules for dynamic styling |
+
+#### Device options
+
+| Key | Type | Description |
+|-----|------|-------------|
+| `entity` | string | `device_tracker.*` entity ID |
+| `name` | string | Display name |
+| `icon` | string | MDI icon (e.g. `mdi:cellphone`) |
+| `battery_entity` | string | `sensor.*` with battery % |
+| `connectivity_entity` | string | `binary_sensor.*` — `on` = connected |
+| `battery_threshold` | number | Low-battery threshold in % (default `20`) |
+
+#### Zone style options
+
+| Key | Type | Description |
+|-----|------|-------------|
+| `zone` | string | Matches the person entity state — use the zone's **friendly name** (e.g. `Uni House`, `home`) |
+| `label` | string | Override display label |
+| `icon` | string | Override MDI icon |
+| `background_color` | string | Hex colour for card background |
+| `border_color` | string | Hex colour for card border / glow ring |
+
+> **Tip:** Use the **Auto-detect zones from HA** button in the Appearance tab — it reads your `zone.*` entities and pre-fills the list automatically.
+
+#### Condition rule options
+
+| Key | Type | Description |
+|-----|------|-------------|
+| `operator` | `and` \| `or` | How sub-conditions are combined |
+| `conditions` | list | One or more entity conditions |
+| `effect` | object | `background_color`, `border_color`, `border_width`, `badge_color`, `badge_icon` |
+
+**Condition:**
+
+| Key | Type | Description |
+|-----|------|-------------|
+| `entity` | string | Any HA entity ID |
+| `attribute` | string | Optional attribute instead of state |
+| `operator` | `eq` \| `neq` \| `lt` \| `gt` \| `lte` \| `gte` \| `contains` | Comparison |
+| `value` | string \| number | Value to compare against |
+
+> Rules are evaluated top-to-bottom. The **last matching rule wins**.
+
+---
+
+## Family Card
+
+A multi-person overview card for tracking the whole household at a glance. Three density modes, optional zone grouping, and a zone summary bar.
+
+### Density Modes
+
+| Compact | Mini |
+|---------|------|
+| ![Compact](docs/screenshots/family-card-compact.png) | ![Mini](docs/screenshots/family-card-mini.png) |
+
+- **Compact** — one row per person: avatar, name, zone badge, and status dot
+- **Mini** — tile grid per person with battery percentage and connectivity
+- **Detailed** — expandable rows; tap any row to reveal the full device list, last seen, ETA, and a "View full card →" link
+
+### Group by Zone
+
+Enable `group_by_zone` to cluster people under coloured zone group headers — great for seeing who is where at a glance.
+
+![Group by zone](docs/screenshots/family-card-grouped.png)
+
+A **zone summary bar** (`show_summary`) displays a coloured dot, count, and label for every occupied zone at the top of the card.
+
+Both features can be toggled independently in the **Display** tab of the editor.
+
+---
+
+### Family Card Features
+
+- **Three density tiers** — Compact, Mini, Detailed
+- **Group by zone** — clusters people under coloured zone headers; Home appears first, then other zones by occupancy
+- **Zone summary bar** — compact coloured-dot overview above the people list
+- **Inline expand** (detailed) — tap any row for the full device list, last seen, ETA, and "View full card" link
+- **Group entity support** — point at a `group.*` entity and people are auto-discovered
+- **Per-person overrides** — display name, photo, ETA sensor per person
+- **Shared zone colours** — automatically inherits from the Theme Card; per-card `zone_styles` override if needed
+- **Full GUI editor** — 4 tabs: People · Appearance · Conditions · Display
+
+---
+
+### Family Card Configuration
+
+```yaml
+type: custom:family-card
+density: detailed                   # compact | mini | detailed
+show_devices: true
+show_last_seen: true
+show_eta: true
+show_notification_badge: true
+group_by_zone: false                # cluster people under zone headers
+show_summary: false                 # zone summary bar at the top
+offline_threshold: 30               # minutes; 0 or omit to disable
+
+people:
+  - entity: person.mark
+    eta_entity: sensor.marks_travel_time
+  - entity: person.harry
+  - entity: person.anabel
+  - entity: person.kate
+  - entity: person.james
+  - entity: person.marion
+```
+
+Alternatively, point at a HA group entity and people are auto-discovered:
+
+```yaml
+type: custom:family-card
+group_entity: group.family
+density: detailed
+```
+
+#### Family card options
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| `density` | `compact` \| `mini` \| `detailed` | `detailed` | Display density |
+| `group_by_zone` | boolean | `false` | Cluster people under zone group headers |
+| `show_summary` | boolean | `false` | Show zone summary bar at the top |
+| `show_devices` | boolean | `true` | Show device battery/connectivity info |
+| `show_last_seen` | boolean | `true` | Show last seen timestamp |
+| `show_eta` | boolean | `true` | Show ETA from travel time sensor |
+| `show_notification_badge` | boolean | `true` | Enable notification badges |
+| `offline_threshold` | number | — | Minutes before avatar is marked stale |
+| `people` | list | — | List of person entities (see below) |
+| `group_entity` | string | — | `group.*` entity — people auto-discovered |
+| `zone_styles` | list | `[]` | Per-zone overrides (falls back to Theme Card) |
+
+#### Per-person options (`people` list)
+
+| Key | Type | Description |
+|-----|------|-------------|
+| `entity` | string | `person.*` entity ID |
+| `name` | string | Override display name |
+| `photo` | string | Override avatar URL |
+| `eta_entity` | string | Travel time sensor for this person |
+
+---
+
+## Theme Card
+
+Configure zone colours once and every Person Card and Family Card on the dashboard inherits them automatically.
+
+### Display Styles
+
+Six visual styles to suit different dashboard layouts — selectable from a visual picker in the editor.
+
+| Legend | Compact | List | Grid |
+|--------|---------|------|------|
+| ![Legend](docs/screenshots/theme-card-legend.png) | ![Compact](docs/screenshots/theme-card-compact.png) | ![List](docs/screenshots/theme-card-list.png) | ![Grid](docs/screenshots/theme-card-grid.png) |
+
+- **`legend`** *(default)* — coloured dots with labels in a wrapping row
+- **`compact`** — smaller dots and tighter spacing for crowded dashboards
+- **`pills`** — filled pill/badge tags using each zone's background and border colour
+- **`list`** — vertical list with colour swatch, zone icon, and label; best for many zones
+- **`grid`** — zone icon tiles in a responsive auto-fill grid with colour accents
+- **`hidden`** — card takes no space; purely provides the shared zone theme to other cards on the dashboard
+
+---
+
+### Theme Card Configuration
+
+```yaml
+type: custom:person-card-theme
+display_style: legend               # legend | compact | pills | list | grid | hidden
+zone_styles:
+  - zone: home
+    label: Home
+    icon: mdi:home
+    background_color: "#1b2e1b"
+    border_color: "#76c442"
+  - zone: Uni House
+    label: Uni House
+    icon: mdi:school
+    background_color: "#1a2332"
+    border_color: "#80deea"
+  - zone: Kerry's
+    label: Kerry's
+    icon: mdi:account-group
+    background_color: "#2e1b3c"
+    border_color: "#ce93d8"
+  - zone: not_home
+    label: Away
+    icon: mdi:map-marker-off
+    border_color: "#ff6d00"
+```
+
+Place the Theme Card anywhere on the dashboard — all Person Cards and Family Cards on the same page pick it up automatically. Per-card `zone_styles` overrides the theme if set.
+
+#### Theme card options
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| `display_style` | `legend` \| `compact` \| `pills` \| `list` \| `grid` \| `hidden` | `legend` | Visual rendering mode |
+| `zone_styles` | list | **required** | Zone colour/icon definitions (same format as Person Card) |
+
+---
+
+## GUI Editor — No YAML Required
+
+All three cards have a full visual editor. The card picker preview populates with real entities from your HA instance so you can see exactly what the card will look like before adding it.
+
+### Person Card Editor
+
+| Person | Devices | Appearance |
+|--------|---------|------------|
+| ![Person tab](docs/screenshots/editor-person-person-tab.png) | ![Devices tab](docs/screenshots/editor-person-devices-tab.png) | ![Appearance tab](docs/screenshots/editor-person-appearance-tab.png) |
+
+| Conditions | Display |
+|------------|---------|
+| ![Conditions tab](docs/screenshots/editor-person-conditions-tab.png) | ![Display tab](docs/screenshots/editor-person-display-tab.png) |
+
+- **Person** — entity picker, display name, photo URL override
+- **Devices** — add/remove devices; set name, icon, battery/connectivity entities, and threshold per device
+- **Appearance** — size picker (with inline descriptions for Hero and Stats), background image, zone styles with auto-detect and colour scheme swatches
+- **Conditions** — AND/OR rule builder for dynamic styling
+- **Display** — show/hide ETA, last seen, notification badge; geocoded address entity; offline threshold
+
+### Family Card Editor
+
+| People | Appearance | Display |
+|--------|------------|---------|
+| ![People tab](docs/screenshots/editor-family-people-tab.png) | ![Appearance tab](docs/screenshots/editor-family-appearance-tab.png) | ![Display tab](docs/screenshots/editor-family-display-tab.png) |
+
+- **People** — density selector (Compact / Mini / Detailed), group entity, and per-person entries with name, photo, and ETA sensor
+- **Appearance** — background image and zone style overrides (with auto-detect from HA)
+- **Conditions** — AND/OR rule builder
+- **Display** — group by zone, zone summary bar, show/hide devices, last seen, ETA, notification badge, offline threshold
+
+### Theme Card Editor
+
+![Theme card editor](docs/screenshots/editor-theme-card.png)
+
+- Visual 3×2 display style picker with inline descriptions
+- Zone list with auto-detect from HA, plus full colour picker and icon selector per zone
 
 ---
 
@@ -82,157 +427,13 @@ Or add manually:
 3. **Settings → Dashboards → Resources** → add `/local/person-card.js` (type: JavaScript module)
 4. Refresh the browser
 
----
-
-## Configuration
-
-The card has a full GUI editor. Everything below is the equivalent YAML for reference.
-
-### Minimal
-
-```yaml
-type: custom:person-card
-person_entity: person.mark
-```
-
-### Full example
-
-```yaml
-type: custom:person-card
-person_entity: person.mark
-name: Mark                          # optional — overrides entity friendly name
-photo: /local/mark.jpg              # optional — overrides entity picture
-size: auto                          # auto | small | medium | large | hero | stats
-show_eta: true
-show_last_seen: true
-show_notification_badge: true
-address_entity: sensor.marks_phone_geocoded_location  # optional
-offline_threshold: 30                           # minutes; 0 or omit to disable
-
-background_image: /local/backgrounds/city.jpg   # optional
-
-zone_styles:
-  - zone: home
-    label: Home
-    icon: mdi:home
-    background_color: "#1b2e1b"
-    border_color: "#76c442"
-  - zone: work
-    label: Office
-    icon: mdi:briefcase
-    background_color: "#1a2332"
-    border_color: "#80deea"
-  - zone: not_home
-    label: Away
-    icon: mdi:map-marker-off
-
-devices:
-  - entity: device_tracker.marks_phone
-    name: Phone
-    icon: mdi:cellphone
-    battery_entity: sensor.marks_phone_battery
-    connectivity_entity: binary_sensor.marks_phone_connected
-    battery_threshold: 25                       # optional — overrides default 20 %
-  - entity: device_tracker.marks_ipad
-    name: iPad
-    icon: mdi:tablet
-    battery_entity: sensor.marks_ipad_battery
-    battery_threshold: 15
-
-conditions:
-  - id: low-battery-alert
-    label: Low battery alert
-    operator: or
-    conditions:
-      - entity: sensor.marks_phone_battery
-        operator: lte
-        value: 20
-      - entity: sensor.marks_ipad_battery
-        operator: lte
-        value: 20
-    effect:
-      border_color: "#f44336"
-      border_width: 2
-      badge_color: "#f44336"
-      badge_icon: mdi:battery-alert
-```
-
----
-
-## Configuration Reference
-
-### Card options
-
-| Key | Type | Default | Description |
-|-----|------|---------|-------------|
-| `person_entity` | string | **required** | `person.*` entity ID |
-| `name` | string | entity friendly name | Override display name |
-| `photo` | string | entity picture | Override avatar URL |
-| `size` | `auto` \| `small` \| `medium` \| `large` \| `hero` \| `stats` | `auto` | Card size tier |
-| `show_eta` | boolean | `true` | Show ETA footer (large only) |
-| `show_last_seen` | boolean | `true` | Show last seen timestamp (large and hero) |
-| `show_notification_badge` | boolean | `true` | Enable notification badge |
-| `address_entity` | string | — | Sensor with geocoded address string |
-| `offline_threshold` | number | — | Minutes without update before avatar is marked stale; `0` or omit to disable |
-| `background_image` | string | — | URL for background image (25 % opacity on standard sizes; 55 % on `stats`) |
-| `zone_styles` | list | `[]` | Per-zone colour/icon overrides |
-| `conditions` | list | `[]` | Condition rules for dynamic styling |
-
-### Device options (`devices` list)
-
-| Key | Type | Description |
-|-----|------|-------------|
-| `entity` | string | `device_tracker.*` entity ID |
-| `name` | string | Display name (falls back to entity ID) |
-| `icon` | string | MDI icon (e.g. `mdi:cellphone`) |
-| `battery_entity` | string | `sensor.*` with battery % (0–100) |
-| `connectivity_entity` | string | `binary_sensor.*` — `on` = connected |
-| `battery_threshold` | number | Low-battery threshold in % (default `20`); bar turns red and notification badge triggers at or below this level |
-
-### Zone style options (`zone_styles` list)
-
-| Key | Type | Description |
-|-----|------|-------------|
-| `zone` | string | Matches the person entity state (e.g. `home`, `work`, `not_home`) |
-| `label` | string | Override display label |
-| `icon` | string | Override MDI icon |
-| `background_color` | string | Hex colour for card background |
-| `border_color` | string | Hex colour for card border |
-
-### Condition rule options (`conditions` list)
-
-| Key | Type | Description |
-|-----|------|-------------|
-| `operator` | `and` \| `or` | How conditions within the rule are combined |
-| `conditions` | list | One or more entity conditions (see below) |
-| `effect` | object | Visual effect applied when rule matches |
-
-**Condition:**
-
-| Key | Type | Description |
-|-----|------|-------------|
-| `entity` | string | Any HA entity ID |
-| `attribute` | string | Optional attribute name instead of state |
-| `operator` | `eq` \| `neq` \| `lt` \| `gt` \| `lte` \| `gte` \| `contains` | Comparison operator |
-| `value` | string \| number | Value to compare against |
-
-**Effect:**
-
-| Key | Type | Description |
-|-----|------|-------------|
-| `background_color` | string | Card background colour |
-| `border_color` | string | Card border colour |
-| `border_width` | number | Border width in px |
-| `badge_color` | string | Notification badge colour |
-| `badge_icon` | string | Notification badge MDI icon |
-
-> Rules are evaluated top-to-bottom. The **last matching rule wins**. Condition effects take priority over zone styles.
+> All three cards (`custom:person-card`, `custom:family-card`, `custom:person-card-theme`) are registered from the single `person-card.js` file — no separate resource entries needed.
 
 ---
 
 ## Colour Schemes
 
-The editor includes 10 built-in colour scheme presets. Click any swatch to apply to a zone style or condition effect, then fine-tune with the colour pickers.
+The editor includes 10 built-in colour scheme presets. Click any swatch in the Appearance tab to apply it to a zone style, then fine-tune with the colour pickers.
 
 | Name | Background | Border |
 |------|-----------|--------|
@@ -258,8 +459,8 @@ When a person is outside all defined zones, the card can display a live geocoded
    - A **template sensor** combining reverse geocode data
    - **OwnTracks**, **Life360**, or similar integrations
 2. In the card editor → **Display** tab → set **Geocoded Address Entity**
-3. On `medium` and `large` sizes, the address replaces "Away" when the person is `not_home`
-   - Short addresses (< 20 chars) — truncates with ellipsis if needed
+3. On `medium` and `large` sizes the address replaces "Away" when the person is `not_home`
+   - Short addresses — truncates with ellipsis if needed
    - Long addresses — smooth CSS ticker animation, loops seamlessly
 4. Falls back to "Away" if the entity is `unavailable` or `unknown`
 
@@ -267,25 +468,27 @@ When a person is outside all defined zones, the card can display a live geocoded
 
 ## Offline / Stale Indicator
 
-When a person's location hasn't updated for a while (e.g. phone was switched off or lost connection), the card can visually flag this:
+When a person's location hasn't updated for a while, the card can visually flag this:
 
 1. In the card editor → **Display** tab → set **Offline threshold (minutes)**
-2. If the person entity's `last_updated` timestamp is older than the threshold, the avatar will:
-   - Dim to 55 % opacity with a greyscale filter
-   - Show a small **clock badge** at the bottom-right corner
-3. Set to `0` or leave blank to disable the indicator
+2. If the person entity's `last_updated` is older than the threshold:
+   - Avatar dims to 55 % opacity with a greyscale filter
+   - A small **clock badge** appears at the bottom-right of the avatar
+3. Set to `0` or leave blank to disable
 
-This is distinct from the connectivity dot on each device tile — the stale indicator reflects the person entity itself not reporting in.
+This is distinct from the per-device connectivity dot — the stale indicator reflects the person entity itself not reporting in.
 
 ---
 
 ## Zone Auto-Detect
 
-Rather than typing zone IDs manually, the editor can read them directly from Home Assistant:
+Rather than typing zone names manually, the editor can read them directly from Home Assistant:
 
 1. In the card editor → **Appearance** tab → click **Auto-detect zones from HA**
-2. All `zone.*` entities in your HA instance are read, and any zones not already configured are added to the list with their friendly name and icon pre-filled
-3. You can then adjust the label, colours, and icon for each zone as normal
+2. All `zone.*` entities are read and any zones not already configured are added with their friendly name, icon, and a colour scheme preset
+3. Adjust the label, colours, and icon for each zone as needed
+
+> Zone names must match the **friendly name** that Home Assistant returns as the person's state (e.g. `Uni House`, not `uni_house`). Auto-detect handles this automatically; the zone editor shows the friendly name by default.
 
 ---
 
@@ -301,136 +504,15 @@ Override card appearance from your Lovelace theme or card-mod:
 
 ---
 
-## Size Tiers
-
-| Tier | Trigger | Shows |
-|------|---------|-------|
-| `small` | < 200 px (auto) | Avatar · Name · Zone only |
-| `medium` | 200–400 px (auto) | + Devices |
-| `large` | > 400 px (auto) | + ETA · Last seen |
-| `hero` | manual only | Centred portrait — see below |
-| `stats` | manual only | Immersive stats — see below |
-
-In `auto` mode (default) the tier updates live via ResizeObserver as the column width changes. `hero` and `stats` must be set manually — they are not part of the auto breakpoint chain.
-
----
-
-## Hero Layout
-
-A centred, portrait-style card designed as a feature card in a full-width column or side panel.
-
-- **120 px avatar** with a glow ring that picks up the zone border colour (white glow if no colour is set)
-- Name in large bold type, zone badge centred below
-- **Horizontal device icon grid** — each device shows as a frosted tile with icon, name, battery bar + %, and connectivity dot
-- Last seen in a centred footer
-- Notification badge pinned to the top-right corner
-- Background image supported at 25 % opacity
-
-```yaml
-type: custom:person-card
-person_entity: person.mark
-size: hero
-background_image: /local/backgrounds/city.jpg
-zone_styles:
-  - zone: home
-    background_color: "#1b2e1b"
-    border_color: "#76c442"   # becomes the glow ring colour
-```
-
----
-
-## Stats Layout
-
-An immersive, data-rich card with a prominent background image and presence statistics.
-
-- **Background image at 55 % opacity** — much more cinematic than other sizes
-- 80 px avatar with name and zone badge in the header
-- **"In zone X"** sub-label showing how long the person has been in their current zone
-- **Two stat boxes** in a 2-column grid:
-  - *In zone* — duration since the person entity's state last changed (e.g. `6h 14m`)
-  - *Last seen* — time since the entity last updated (e.g. `2m`)
-- Full device list in a frosted-glass panel with backdrop blur
-- Notification badge in the header
-
-```yaml
-type: custom:person-card
-person_entity: person.mark
-size: stats
-background_image: /local/backgrounds/city.jpg
-```
-
----
-
-## Family Card
-
-A multi-person overview card for tracking the whole household at a glance.
-
-```yaml
-type: custom:family-card
-people:
-  - entity: person.mark
-    eta_entity: sensor.marks_travel_time
-  - entity: person.jane
-  - entity: person.sophie
-density: detailed          # compact | mini | detailed
-show_devices: true
-show_last_seen: true
-offline_threshold: 30
-```
-
-Three density tiers:
-- **Compact** — one row per person: avatar, name, zone badge, status dot
-- **Mini** — tile grid per person with device battery bars
-- **Detailed** — expandable rows; tap to see full device list, last seen, ETA, and "View full card" link
-
-Alternatively, point at a HA group entity and people are auto-discovered:
-
-```yaml
-type: custom:family-card
-group_entity: group.family
-density: detailed
-```
-
-Add `family-card.js` as a second Dashboard resource:
-**Settings → Dashboards → Resources** → `/local/community/lovelace-person-card/family-card.js`
-
----
-
-## Theme Card
-
-Configure zone colours once and share them across all person-card and family-card instances.
-
-```yaml
-type: custom:person-card-theme
-zone_styles:
-  - zone: home
-    label: Home
-    icon: mdi:home
-    background_color: "#1b2e1b"
-    border_color: "#76c442"
-  - zone: work
-    label: Office
-    icon: mdi:briefcase
-    background_color: "#1a2332"
-    border_color: "#80deea"
-  - zone: not_home
-    label: Away
-    icon: mdi:map-marker-off
-    border_color: "#ff6d00"
-```
-
-Renders as a compact dot legend — `● Home  ● Office  ● Away` — using each zone's border colour. Place it anywhere on the dashboard; all cards on the same page pick it up automatically. Per-card `zone_styles` overrides the theme if set.
-
----
-
 ## Development
 
 ```bash
 git clone https://github.com/squizzer73/lovelace-person-card.git
 cd lovelace-person-card
 npm install
-npm run build      # outputs dist/person-card.js
+npm run build      # outputs dist/person-card.js (all three cards bundled)
 npm test           # vitest unit tests
+npm run typecheck  # TypeScript type checking
 ```
 
 **Stack:** Lit 3 · TypeScript · esbuild · vitest
