@@ -101,6 +101,8 @@ export class FamilyCard extends LitElement {
     } else {
       this.style.removeProperty('--pc-background-image');
     }
+    // Apply card theme as HTML attribute so :host([card-theme="..."]) CSS selectors fire
+    this.setAttribute('card-theme', this._config.card_theme ?? 'default');
   }
 
   private _zoneStyles() {
