@@ -7,6 +7,22 @@ Versions follow [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [0.6.0] — 2026-04-16
+
+### Added
+
+- **Card themes** — five optional visual skins for Person Card and Family Card, selectable per card via `card_theme` or from the new theme picker in the Display tab of each editor:
+  - `glass` — frosted glass with backdrop blur; inherits the colour of whatever is behind it
+  - `scifi` — dark cyberpunk with neon accent, corner brackets, and CRT scanlines
+  - `steampunk` — warm copper/brass with aged mahogany background and serif type
+  - `terminal` — Matrix-green phosphor on black with CRT scanlines and screen vignette
+  - `neon` — deep purple-black with hot magenta neon glow and edge light streaks
+  - `default` *(unchanged)* — existing appearance; no migration required
+
+  Zone colours from the Theme Card continue to apply automatically within every theme — the zone's `border_color` drives the neon/accent colour and a new `--pc-glow-color` variable (pre-computed rgba version) drives glow effects.
+
+---
+
 ## [0.5.1] — 2026-04-14
 
 ### Added
