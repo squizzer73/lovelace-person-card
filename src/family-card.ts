@@ -9,7 +9,7 @@ import { resolveZoneStyles, THEME_EVENT } from './shared/theme-registry';
 import { evaluateConditions } from './shared/condition-engine';
 import { getBatteryLevel, getConnectivity, shouldShowNotificationBadge } from './shared/ha-helpers';
 import { formatDuration } from './shared/format-utils';
-import { resolveZoneStyle, getZoneLabel, getZoneIcon } from './shared/zone-utils';
+import { resolveZoneStyle, getZoneLabel, getZoneIcon, hexToRgba } from './shared/zone-utils';
 import './components/device-tile';
 import './components/location-badge';
 import './components/notification-badge';
@@ -92,9 +92,11 @@ export class FamilyCard extends LitElement {
     if (borderColor) {
       this.style.setProperty('--pc-border-color', borderColor);
       this.style.setProperty('--pc-border-width', `${effect.border_width ?? 2}px`);
+      this.style.setProperty('--pc-glow-color', hexToRgba(borderColor, 0.25));
     } else {
       this.style.removeProperty('--pc-border-color');
       this.style.removeProperty('--pc-border-width');
+      this.style.removeProperty('--pc-glow-color');
     }
     if (this._config.background_image) {
       this.style.setProperty('--pc-background-image', `url('${this._config.background_image}')`);
