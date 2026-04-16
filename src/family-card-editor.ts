@@ -2,9 +2,18 @@
 import { LitElement, html, css } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import type { HomeAssistant } from 'custom-card-helpers';
-import type { FamilyCardConfig, FamilyPersonConfig, ConditionRule, Condition } from './shared/types';
+import type { FamilyCardConfig, FamilyPersonConfig, ConditionRule, Condition, CardTheme } from './shared/types';
 import { COLOR_SCHEMES } from './shared/constants';
 import './components/zone-editor';
+
+const CARD_THEMES: Array<{ value: CardTheme; label: string; icon: string }> = [
+  { value: 'default',   label: 'Default',   icon: 'mdi:palette-outline' },
+  { value: 'glass',     label: 'Glass',     icon: 'mdi:blur' },
+  { value: 'scifi',     label: 'Sci-Fi',    icon: 'mdi:chip' },
+  { value: 'steampunk', label: 'Steampunk', icon: 'mdi:cog-outline' },
+  { value: 'terminal',  label: 'Terminal',  icon: 'mdi:console' },
+  { value: 'neon',      label: 'Neon',      icon: 'mdi:led-on' },
+];
 
 @customElement('family-card-editor')
 export class FamilyCardEditor extends LitElement {
@@ -37,6 +46,43 @@ export class FamilyCardEditor extends LitElement {
     .scheme-row { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; margin: 2px 0 4px; }
     .scheme-swatch { width: 26px; height: 26px; border-radius: 5px; cursor: pointer; flex-shrink: 0; }
     .color-row { display: flex; align-items: center; gap: 8px; }
+    .theme-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+    .theme-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      padding: 10px 6px 8px;
+      border-radius: 10px;
+      border: 2px solid var(--divider-color, rgba(0,0,0,0.15));
+      background: none;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+      text-align: center;
+    }
+    .theme-btn:hover {
+      background: rgba(var(--rgb-primary-color, 33,150,243), 0.06);
+    }
+    .theme-btn.active {
+      border-color: var(--primary-color);
+      background: rgba(var(--rgb-primary-color, 33,150,243), 0.1);
+    }
+    .theme-btn-label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--primary-text-color);
+    }
+    .theme-icon {
+      --mdc-icon-size: 22px;
+      color: var(--secondary-text-color);
+    }
+    .theme-btn.active .theme-icon {
+      color: var(--primary-color);
+    }
   `;
 
   setConfig(config: FamilyCardConfig) { this._config = config; }
@@ -249,8 +295,30 @@ export class FamilyCardEditor extends LitElement {
     `;
   }
 
+  private _renderThemePicker() {
+    const current = this._config.card_theme ?? 'default';
+    return html`
+      <div class="row">
+        <label>Card Theme</label>
+        <div class="theme-grid">
+          ${CARD_THEMES.map(t => html`
+            <button
+              class="theme-btn ${current === t.value ? 'active' : ''}"
+              @click=${() => this._set({ card_theme: t.value === 'default' ? undefined : t.value as CardTheme })}
+              title=${t.label}
+            >
+              <ha-icon class="theme-icon" .icon=${t.icon}></ha-icon>
+              <span class="theme-btn-label">${t.label}</span>
+            </button>
+          `)}
+        </div>
+      </div>
+    `;
+  }
+
   private _renderDisplayTab() {
     return html`
+      ${this._renderThemePicker()}
       <div class="row"><ha-formfield label="Group people by zone">
         <ha-switch .checked=${this._config.group_by_zone === true}
           @change=${(e: Event) => this._set({ group_by_zone: (e.target as HTMLInputElement).checked })}></ha-switch>
