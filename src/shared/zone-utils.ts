@@ -33,3 +33,20 @@ export function getZoneIcon(zone: string, zoneStyles: ZoneStyleConfig[], hasAddr
   if (zone === 'unknown') return 'mdi:help-circle';
   return 'mdi:map-marker';
 }
+
+/**
+ * Convert a CSS hex colour string to an rgba() string with the given alpha.
+ * Handles 3-char and 6-char hex, with or without leading #.
+ * Falls back to rgba(0,0,0,alpha) for invalid input.
+ */
+export function hexToRgba(hex: string, alpha: number): string {
+  const h = hex.replace('#', '');
+  const full = h.length === 3
+    ? h.split('').map(c => c + c).join('')
+    : h;
+  const r = parseInt(full.slice(0, 2), 16);
+  const g = parseInt(full.slice(2, 4), 16);
+  const b = parseInt(full.slice(4, 6), 16);
+  if (isNaN(r) || isNaN(g) || isNaN(b)) return `rgba(0, 0, 0, ${alpha})`;
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}

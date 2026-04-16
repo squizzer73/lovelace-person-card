@@ -1,6 +1,6 @@
 // tests/shared/zone-utils.test.ts
 import { describe, it, expect } from 'vitest';
-import { resolveZoneStyle, getZoneLabel, getZoneIcon } from '../../src/shared/zone-utils';
+import { resolveZoneStyle, getZoneLabel, getZoneIcon, hexToRgba } from '../../src/shared/zone-utils';
 import type { ZoneStyleConfig } from '../../src/shared/types';
 
 const zoneStyles: ZoneStyleConfig[] = [
@@ -80,5 +80,27 @@ describe('getZoneIcon', () => {
 
   it('returns mdi:map-marker as fallback', () => {
     expect(getZoneIcon('school', [])).toBe('mdi:map-marker');
+  });
+});
+
+describe('hexToRgba', () => {
+  it('converts 6-char hex to rgba', () => {
+    expect(hexToRgba('#76c442', 0.25)).toBe('rgba(118, 196, 66, 0.25)');
+  });
+
+  it('converts 3-char hex to rgba', () => {
+    expect(hexToRgba('#abc', 0.5)).toBe('rgba(170, 187, 204, 0.5)');
+  });
+
+  it('handles missing # prefix', () => {
+    expect(hexToRgba('76c442', 0.25)).toBe('rgba(118, 196, 66, 0.25)');
+  });
+
+  it('returns fallback rgba(0,0,0,alpha) for invalid hex', () => {
+    expect(hexToRgba('invalid', 0.25)).toBe('rgba(0, 0, 0, 0.25)');
+  });
+
+  it('alpha value is preserved exactly', () => {
+    expect(hexToRgba('#ffffff', 0.1)).toBe('rgba(255, 255, 255, 0.1)');
   });
 });

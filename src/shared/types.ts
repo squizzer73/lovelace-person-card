@@ -26,6 +26,7 @@ export interface PersonCardConfig {
   zone_styles?: ZoneStyleConfig[];
   conditions?: ConditionRule[];
   offline_threshold?: number; // minutes since last update before showing stale indicator; 0 or undefined = disabled
+  card_theme?: CardTheme;
 }
 
 export interface DeviceConfig {
@@ -81,6 +82,8 @@ export type ConnectivityState = 'online' | 'offline' | 'unknown';
 
 export type ThemeCardDisplayStyle = 'legend' | 'compact' | 'pills' | 'list' | 'grid' | 'hidden';
 
+export type CardTheme = 'default' | 'glass' | 'scifi' | 'steampunk' | 'terminal' | 'neon';
+
 export interface PersonCardThemeConfig {
   zone_styles: ZoneStyleConfig[];
   display_style?: ThemeCardDisplayStyle;
@@ -116,4 +119,5 @@ export interface FamilyCardConfig {
   zone_styles?: ZoneStyleConfig[];
   conditions?: ConditionRule[];
   background_image?: string;
+  card_theme?: CardTheme;
 }
