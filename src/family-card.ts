@@ -348,6 +348,12 @@ export class FamilyCard extends LitElement {
     const personState = this.hass.states[person.entity];
     const zoneDuration = personState?.last_changed ? formatDuration(personState.last_changed) : '';
     const accentColor = zoneStyle?.border_color ?? 'rgba(255,255,255,0.1)';
+    const address = (zone === 'not_home' && person.address_entity)
+      ? (() => {
+          const s = this.hass.states[person.address_entity!];
+          return (s && s.state !== 'unavailable' && s.state !== 'unknown') ? s.state : '';
+        })()
+      : '';
 
     return html`
       <div class="person-row" style="--row-accent:${accentColor}"
@@ -357,7 +363,7 @@ export class FamilyCard extends LitElement {
           <div class="person-info">
             <div class="person-name">${this._getPersonName(person)}</div>
             <div class="person-zone" style="display:flex;align-items:center;gap:6px">
-              <person-card-location-badge .zone=${zone} .zoneStyles=${zoneStyles}></person-card-location-badge>
+              <person-card-location-badge .zone=${zone} .zoneStyles=${zoneStyles} .address=${address}></person-card-location-badge>
               ${zoneDuration ? html`<span style="font-size:0.7rem;color:rgba(255,255,255,0.35)">· ${zoneDuration}</span>` : ''}
             </div>
           </div>

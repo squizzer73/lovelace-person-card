@@ -130,9 +130,15 @@ export const familyCardStyles = css`
   :host([density='compact']) .avatar,
   :host([density='compact']) .avatar-placeholder { width: 32px; height: 32px; }
 
+  :host([density='detailed']) .avatar,
+  :host([density='detailed']) .avatar-placeholder { width: 46px; height: 46px; }
+  :host([density='detailed']) .avatar-placeholder ha-icon { --mdc-icon-size: 22px; }
+
   .person-info { flex: 1; min-width: 0; }
   .person-name { font-size: 0.9rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  :host([density='detailed']) .person-name { font-size: 1.0rem; }
   .person-zone { font-size: 0.72rem; color: rgba(255,255,255,0.55); margin-top: 1px; }
+  :host([density='detailed']) .person-zone { font-size: 0.78rem; }
 
   .person-row-meta { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
 

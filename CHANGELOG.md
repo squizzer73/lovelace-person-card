@@ -7,6 +7,15 @@ Versions follow [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [0.6.2] — 2026-04-17
+
+### Changed
+
+- **Family card detailed view — larger avatar and text** — the `detailed` density now renders avatars at 46 × 46 px (up from 36) and person name at 1.0 rem (up from 0.9 rem), making the default view more spacious and readable
+- **Family card detailed view — scrolling geocoded address** — when a person's `address_entity` is configured and they are `not_home`, the location badge now uses the same scrolling ticker animation as the person card for addresses longer than 20 characters, instead of clipping with ellipsis
+
+---
+
 ## [0.6.1] — 2026-04-17
 
 ### Changed
