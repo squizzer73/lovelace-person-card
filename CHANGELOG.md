@@ -7,6 +7,19 @@ Versions follow [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [0.6.1] — 2026-04-17
+
+### Changed
+
+- **Card themes visual overhaul** — all five themes redesigned to be more dramatically distinctive:
+  - `glass` — deeper translucency with stronger inset edge highlights and larger radius
+  - `scifi` — corner bracket overlays (TL + BR), stronger glow layers, diagonal tinted gradient
+  - `steampunk` — triple-ring brass frame (border + double box-shadow outline), rivet corner decorations (TL + BR), darker mahogany-to-black background
+  - `terminal` — animated scrolling code-line background (CSS `@keyframes`), stronger CRT scanline + vignette overlay, deeper phosphor glow
+  - `neon` — 2px border + multi-layer outer glow, neon tube streak on top and bottom edges, stronger avatar gradient
+
+---
+
 ## [0.6.0] — 2026-04-16
 
 ### Added

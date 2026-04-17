@@ -333,194 +333,352 @@ export const cardStyles = css`
 
   /* ── Glass ──────────────────────────────────────── */
   :host([card-theme="glass"]) {
-    background: rgba(255, 255, 255, 0.08);
-    backdrop-filter: blur(24px) saturate(160%);
-    -webkit-backdrop-filter: blur(24px) saturate(160%);
-    border: 1px solid var(--pc-border-color, rgba(255, 255, 255, 0.22));
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.18);
-    border-radius: var(--person-card-border-radius, 16px);
+    background: rgba(255, 255, 255, 0.10);
+    backdrop-filter: blur(28px) saturate(180%) brightness(1.05);
+    -webkit-backdrop-filter: blur(28px) saturate(180%) brightness(1.05);
+    border: 1px solid rgba(255, 255, 255, 0.38);
+    box-shadow:
+      0 12px 40px rgba(0, 0, 0, 0.45),
+      inset 0 1px 0 rgba(255, 255, 255, 0.35),
+      inset 0 -1px 0 rgba(255, 255, 255, 0.08),
+      inset 1px 0 0 rgba(255, 255, 255, 0.12),
+      inset -1px 0 0 rgba(255, 255, 255, 0.12),
+      0 0 0 1px rgba(255, 255, 255, 0.06);
+    border-radius: var(--person-card-border-radius, 20px);
+    color: rgba(255, 255, 255, 0.92);
   }
   :host([card-theme="glass"]) .avatar {
-    border-color: rgba(255, 255, 255, 0.35);
-    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.5);
+    background: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.35);
   }
   :host([card-theme="glass"]) .avatar-placeholder {
     background: rgba(255, 255, 255, 0.12);
-    border: 2px solid rgba(255, 255, 255, 0.35);
+    border: 2px solid rgba(255, 255, 255, 0.45);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3);
   }
   :host([card-theme="glass"]) .divider {
-    background: rgba(255, 255, 255, 0.07);
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
   }
   :host([card-theme="glass"]) .stale-indicator {
     border-color: transparent;
-    background: rgba(80, 80, 80, 0.6);
+    background: rgba(80, 80, 80, 0.5);
+  }
+  :host([card-theme="glass"]) .zone-label {
+    color: rgba(255, 255, 255, 0.65);
   }
 
   /* ── Sci-Fi ─────────────────────────────────────── */
   :host([card-theme="scifi"]) {
-    background: #030f22;
+    background: linear-gradient(160deg, #030f22 0%, #010810 100%);
     border: 1px solid var(--pc-border-color, #00c8f0);
-    border-radius: 4px;
-    box-shadow: 0 0 22px var(--pc-glow-color, rgba(0, 200, 240, 0.22));
+    border-radius: 2px;
+    box-shadow:
+      0 0 0 1px rgba(0, 200, 240, 0.12),
+      0 0 20px var(--pc-glow-color, rgba(0, 200, 240, 0.2)),
+      0 0 50px var(--pc-glow-color, rgba(0, 200, 240, 0.08)),
+      inset 0 0 40px rgba(0, 60, 100, 0.12);
     font-family: 'Courier New', 'Consolas', monospace;
+  }
+  /* TL + BR corner brackets */
+  :host([card-theme="scifi"])::before {
+    content: '';
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    width: 20px;
+    height: 20px;
+    border-top: 2px solid var(--pc-border-color, #00c8f0);
+    border-left: 2px solid var(--pc-border-color, #00c8f0);
+    pointer-events: none;
+    z-index: 10;
+    filter: drop-shadow(0 0 4px var(--pc-glow-color, rgba(0, 200, 240, 0.8)));
+  }
+  /* TR + BL corner brackets */
+  :host([card-theme="scifi"])::after {
+    content: '';
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    width: 20px;
+    height: 20px;
+    border-bottom: 2px solid var(--pc-border-color, #00c8f0);
+    border-right: 2px solid var(--pc-border-color, #00c8f0);
+    pointer-events: none;
+    z-index: 10;
+    filter: drop-shadow(0 0 4px var(--pc-glow-color, rgba(0, 200, 240, 0.8)));
   }
   :host([card-theme="scifi"]) .card-content::before {
     content: '';
     position: absolute;
     inset: 0;
-    background: repeating-linear-gradient(
-      0deg,
-      transparent,
-      transparent 2px,
-      rgba(0, 0, 0, 0.18) 2px,
-      rgba(0, 0, 0, 0.18) 4px
-    );
+    background:
+      linear-gradient(160deg, rgba(0, 200, 240, 0.04) 0%, transparent 40%),
+      repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 3px,
+        rgba(0, 0, 0, 0.14) 3px,
+        rgba(0, 0, 0, 0.14) 4px
+      );
     pointer-events: none;
-    z-index: 100;
+    z-index: 1;
     border-radius: inherit;
   }
   :host([card-theme="scifi"]) .avatar {
     border-radius: 2px;
     border-color: var(--pc-border-color, #00c8f0);
-    background: #021020;
-    box-shadow: 0 0 8px var(--pc-glow-color, rgba(0, 200, 240, 0.3));
+    background: #010d1e;
+    box-shadow: 0 0 12px var(--pc-glow-color, rgba(0, 200, 240, 0.35)),
+      inset 0 0 8px rgba(0, 200, 240, 0.05);
   }
   :host([card-theme="scifi"]) .avatar-placeholder {
-    background: #021020;
+    background: #010d1e;
     border-radius: 2px;
     border: 1px solid var(--pc-border-color, #00c8f0);
-    box-shadow: 0 0 8px var(--pc-glow-color, rgba(0, 200, 240, 0.3));
+    box-shadow: 0 0 12px var(--pc-glow-color, rgba(0, 200, 240, 0.35));
   }
   :host([card-theme="scifi"]) .name {
     color: var(--pc-border-color, #00c8f0);
     letter-spacing: 0.1em;
     text-transform: uppercase;
-    text-shadow: 0 0 8px var(--pc-glow-color, rgba(0, 200, 240, 0.5));
+    font-size: 0.85em;
+    text-shadow: 0 0 8px var(--pc-glow-color, rgba(0, 200, 240, 0.8));
+  }
+  :host([card-theme="scifi"]) .zone-label {
+    color: rgba(0, 200, 240, 0.5);
+    letter-spacing: 0.08em;
   }
   :host([card-theme="scifi"]) .divider {
-    background: rgba(0, 200, 240, 0.15);
+    background: linear-gradient(90deg, transparent, var(--pc-border-color, rgba(0, 200, 240, 0.3)), transparent);
   }
   :host([card-theme="scifi"]) .footer {
-    color: rgba(0, 200, 240, 0.35);
+    color: rgba(0, 200, 240, 0.3);
+    letter-spacing: 0.08em;
+    font-size: 0.75em;
   }
 
   /* ── Steampunk ──────────────────────────────────── */
   :host([card-theme="steampunk"]) {
-    background: linear-gradient(160deg, #1e1200 0%, #140c00 100%);
-    border: 2px solid var(--pc-border-color, #a0682a);
-    border-radius: 6px;
-    box-shadow: 0 4px 24px rgba(160, 104, 42, 0.25), inset 0 1px 0 rgba(255, 210, 120, 0.08);
+    background: linear-gradient(160deg, #1a0f00 0%, #0e0800 60%, #060400 100%);
+    border: 3px solid var(--pc-border-color, #8a5a1e);
+    border-radius: 3px;
+    box-shadow:
+      0 0 0 1px #2a1a08,
+      0 0 0 5px #110a00,
+      0 0 0 7px var(--pc-border-color, #6a4418),
+      inset 0 0 30px rgba(150, 90, 20, 0.06),
+      inset 0 1px 0 rgba(255, 200, 80, 0.08),
+      0 8px 40px rgba(0, 0, 0, 0.7);
     font-family: Georgia, 'Times New Roman', serif;
+    color: #d4a84b;
+  }
+  /* Rivet: top-left */
+  :host([card-theme="steampunk"])::before {
+    content: '';
+    position: absolute;
+    top: 7px;
+    left: 7px;
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #d4922a, #5a3810);
+    border: 1px solid #9a6a20;
+    box-shadow: inset 0 1px 2px rgba(255, 220, 100, 0.3), 0 1px 3px rgba(0, 0, 0, 0.6);
+    pointer-events: none;
+    z-index: 10;
+  }
+  /* Rivet: bottom-right */
+  :host([card-theme="steampunk"])::after {
+    content: '';
+    position: absolute;
+    bottom: 7px;
+    right: 7px;
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #d4922a, #5a3810);
+    border: 1px solid #9a6a20;
+    box-shadow: inset 0 1px 2px rgba(255, 220, 100, 0.3), 0 1px 3px rgba(0, 0, 0, 0.6);
+    pointer-events: none;
+    z-index: 10;
   }
   :host([card-theme="steampunk"]) .avatar {
     border-color: var(--pc-border-color, #a0682a);
-    background: #1a0e00;
-    box-shadow: 0 0 10px var(--pc-glow-color, rgba(160, 104, 42, 0.3));
+    background: radial-gradient(circle, #1e1000, #0e0800);
+    box-shadow: 0 0 12px var(--pc-glow-color, rgba(160, 104, 42, 0.35)),
+      inset 0 1px 2px rgba(255, 200, 80, 0.08);
   }
   :host([card-theme="steampunk"]) .avatar-placeholder {
-    background: #1a0e00;
+    background: radial-gradient(circle, #1e1000, #0e0800);
     border: 2px solid var(--pc-border-color, #a0682a);
-    box-shadow: 0 0 10px var(--pc-glow-color, rgba(160, 104, 42, 0.3));
+    box-shadow: 0 0 12px var(--pc-glow-color, rgba(160, 104, 42, 0.35));
   }
   :host([card-theme="steampunk"]) .name {
-    color: #e8c070;
+    color: #e8c878;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  }
+  :host([card-theme="steampunk"]) .zone-label {
+    color: rgba(200, 160, 80, 0.55);
   }
   :host([card-theme="steampunk"]) .divider {
-    background: rgba(160, 104, 42, 0.2);
+    background: linear-gradient(90deg, transparent, var(--pc-border-color, rgba(160, 104, 42, 0.5)), transparent);
   }
   :host([card-theme="steampunk"]) .footer {
-    color: rgba(160, 104, 42, 0.5);
+    color: rgba(160, 104, 42, 0.45);
+    font-style: italic;
   }
 
   /* ── Terminal ───────────────────────────────────── */
+  @keyframes pc-terminal-scroll {
+    from { background-position: 0 0; }
+    to   { background-position: 0 -120px; }
+  }
   :host([card-theme="terminal"]) {
     background: #000;
     border: 1px solid var(--pc-border-color, #00ff41);
     border-radius: 0;
-    box-shadow: 0 0 14px var(--pc-glow-color, rgba(0, 255, 65, 0.3));
+    box-shadow:
+      0 0 8px var(--pc-glow-color, rgba(0, 255, 65, 0.35)),
+      0 0 30px var(--pc-glow-color, rgba(0, 255, 65, 0.12)),
+      inset 0 0 40px rgba(0, 20, 0, 0.6);
     font-family: 'Courier New', 'Consolas', monospace;
+    color: var(--pc-border-color, #00ff41);
   }
+  /* Scrolling code-line background */
   :host([card-theme="terminal"]) .card-content::before {
     content: '';
     position: absolute;
     inset: 0;
-    background: repeating-linear-gradient(
-      0deg,
-      transparent,
-      transparent 2px,
-      rgba(0, 0, 0, 0.22) 2px,
-      rgba(0, 0, 0, 0.22) 4px
-    );
+    background-image:
+      repeating-linear-gradient(
+        0deg,
+        rgba(0, 255, 65, 0.028) 0px,
+        rgba(0, 255, 65, 0.028) 10px,
+        transparent 10px,
+        transparent 12px
+      );
+    background-size: 100% 12px;
+    animation: pc-terminal-scroll 2.5s linear infinite;
     pointer-events: none;
-    z-index: 100;
+    z-index: 1;
   }
+  /* Scanlines + vignette overlay */
   :host([card-theme="terminal"]) .card-content::after {
     content: '';
     position: absolute;
     inset: 0;
-    background: radial-gradient(ellipse at center, transparent 55%, rgba(0, 0, 0, 0.45) 100%);
+    background:
+      repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 3px,
+        rgba(0, 0, 0, 0.18) 3px,
+        rgba(0, 0, 0, 0.18) 4px
+      ),
+      radial-gradient(ellipse at center, transparent 45%, rgba(0, 0, 0, 0.55) 100%);
     pointer-events: none;
-    z-index: 100;
+    z-index: 2;
   }
   :host([card-theme="terminal"]) .avatar {
     border-radius: 0;
     border-color: var(--pc-border-color, #00ff41);
-    background: #001100;
-    box-shadow: 0 0 8px var(--pc-glow-color, rgba(0, 255, 65, 0.25));
+    background: #001500;
+    box-shadow: 0 0 10px var(--pc-glow-color, rgba(0, 255, 65, 0.3)),
+      inset 0 0 6px rgba(0, 255, 65, 0.05);
   }
   :host([card-theme="terminal"]) .avatar-placeholder {
-    background: #001100;
+    background: #001500;
     border-radius: 0;
     border: 1px solid var(--pc-border-color, #00ff41);
-    box-shadow: 0 0 8px var(--pc-glow-color, rgba(0, 255, 65, 0.25));
+    box-shadow: 0 0 10px var(--pc-glow-color, rgba(0, 255, 65, 0.3));
   }
   :host([card-theme="terminal"]) .name {
     color: var(--pc-border-color, #00ff41);
     letter-spacing: 0.08em;
-    text-shadow: 0 0 6px var(--pc-glow-color, rgba(0, 255, 65, 0.5));
+    text-shadow: 0 0 8px var(--pc-glow-color, rgba(0, 255, 65, 0.7));
+  }
+  :host([card-theme="terminal"]) .zone-label {
+    color: rgba(0, 255, 65, 0.45);
   }
   :host([card-theme="terminal"]) .divider {
-    background: rgba(0, 255, 65, 0.12);
+    background: linear-gradient(90deg, transparent, var(--pc-border-color, rgba(0, 255, 65, 0.25)), transparent);
   }
   :host([card-theme="terminal"]) .footer {
-    color: rgba(0, 255, 65, 0.35);
+    color: rgba(0, 255, 65, 0.3);
+    letter-spacing: 0.08em;
   }
 
   /* ── Neon Noir ──────────────────────────────────── */
   :host([card-theme="neon"]) {
-    background: linear-gradient(160deg, #0d001f 0%, #090016 100%);
-    border: 1px solid var(--pc-border-color, #c800ff);
-    border-radius: 12px;
-    box-shadow: 0 0 28px var(--pc-glow-color, rgba(200, 0, 255, 0.28));
+    background: linear-gradient(160deg, #0a0018 0%, #060010 100%);
+    border: 2px solid var(--pc-border-color, #e000ff);
+    border-radius: 14px;
+    box-shadow:
+      0 0 6px var(--pc-border-color, #e000ff),
+      0 0 20px var(--pc-glow-color, rgba(224, 0, 255, 0.45)),
+      0 0 60px var(--pc-glow-color, rgba(224, 0, 255, 0.18)),
+      inset 0 0 20px rgba(200, 0, 255, 0.04);
   }
-  :host([card-theme="neon"]) .card-content::before {
+  /* Top neon tube streak */
+  :host([card-theme="neon"])::before {
     content: '';
     position: absolute;
-    top: 0;
-    left: 15%;
-    right: 15%;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, var(--pc-border-color, #c800ff), transparent);
+    top: -2px;
+    left: 12%;
+    right: 12%;
+    height: 2px;
+    background: var(--pc-border-color, #e000ff);
+    box-shadow:
+      0 0 6px 1px var(--pc-border-color, #e000ff),
+      0 0 18px 4px var(--pc-glow-color, rgba(224, 0, 255, 0.6));
+    border-radius: 2px;
+    pointer-events: none;
+    z-index: 2;
+  }
+  /* Bottom neon tube streak */
+  :host([card-theme="neon"])::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 12%;
+    right: 12%;
+    height: 2px;
+    background: var(--pc-border-color, #e000ff);
+    box-shadow:
+      0 0 6px 1px var(--pc-border-color, #e000ff),
+      0 0 18px 4px var(--pc-glow-color, rgba(224, 0, 255, 0.6));
+    border-radius: 2px;
     pointer-events: none;
     z-index: 2;
   }
   :host([card-theme="neon"]) .avatar {
-    border-color: var(--pc-border-color, #c800ff);
-    background: linear-gradient(135deg, #2d0060, #600080);
-    box-shadow: 0 0 14px var(--pc-glow-color, rgba(200, 0, 255, 0.4));
+    border-color: var(--pc-border-color, #e000ff);
+    background: linear-gradient(135deg, #2a0050, #580078);
+    box-shadow:
+      0 0 14px var(--pc-glow-color, rgba(224, 0, 255, 0.5)),
+      inset 0 0 10px rgba(200, 0, 255, 0.08);
   }
   :host([card-theme="neon"]) .avatar-placeholder {
-    background: linear-gradient(135deg, #2d0060, #600080);
-    border: 2px solid var(--pc-border-color, #c800ff);
-    box-shadow: 0 0 14px var(--pc-glow-color, rgba(200, 0, 255, 0.4));
+    background: linear-gradient(135deg, #2a0050, #580078);
+    border: 2px solid var(--pc-border-color, #e000ff);
+    box-shadow: 0 0 14px var(--pc-glow-color, rgba(224, 0, 255, 0.5));
   }
   :host([card-theme="neon"]) .name {
-    text-shadow: 0 0 10px var(--pc-glow-color, rgba(200, 0, 255, 0.5));
+    color: #fff;
+    font-weight: 700;
+    text-shadow:
+      0 0 8px var(--pc-border-color, #e000ff),
+      0 0 20px var(--pc-glow-color, rgba(224, 0, 255, 0.5));
+  }
+  :host([card-theme="neon"]) .zone-label {
+    color: rgba(224, 0, 255, 0.45);
   }
   :host([card-theme="neon"]) .divider {
-    background: rgba(200, 0, 255, 0.12);
+    background: linear-gradient(90deg, transparent, var(--pc-border-color, rgba(224, 0, 255, 0.3)), transparent);
+    box-shadow: 0 0 6px var(--pc-glow-color, rgba(224, 0, 255, 0.2));
   }
   :host([card-theme="neon"]) .footer {
-    color: rgba(200, 0, 255, 0.4);
+    color: rgba(224, 0, 255, 0.35);
   }
 `;
