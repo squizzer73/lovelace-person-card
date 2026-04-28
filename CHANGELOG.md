@@ -7,6 +7,14 @@ Versions follow [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [0.7.1] — 2026-04-28
+
+### Fixed
+
+- **Family Grid Card not appearing in HA card picker** — `family-grid-card` was missing from the `person-card.js` bundle. HACS only registers `person-card.js` as a Lovelace resource, so the grid card element was never loaded. Fixed by importing `family-grid-card` into `person-card.ts` so it bundles alongside the other three cards — no extra resource file needed.
+
+---
+
 ## [0.7.0] — 2026-04-28
 
 ### Added

@@ -32,6 +32,7 @@ import './components/last-seen';
 import './person-card-editor';
 import './person-card-theme';
 import './family-card';
+import './family-grid-card';
 
 // HACS / HA card registration
 declare global {
