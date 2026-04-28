@@ -25,7 +25,7 @@ jobs:
         run: npm run build
 
       - name: Verify build output
-        run: test -f dist/person-card.js && test -f dist/family-card.js
+        run: test -f dist/person-card.js && test -f dist/family-card.js && test -f dist/family-grid-card.js
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
@@ -33,4 +33,5 @@ jobs:
           files: |
             dist/person-card.js
             dist/family-card.js
+            dist/family-grid-card.js
           generate_release_notes: true
