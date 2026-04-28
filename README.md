@@ -2,7 +2,7 @@
 
 ![Person Card](docs/banner.svg)
 
-A suite of bold, at-a-glance Lovelace cards for tracking people in Home Assistant — individual detail, household overview, and shared zone theme in one package.
+A suite of bold, at-a-glance Lovelace cards for tracking people in Home Assistant — individual detail, household overview, animated grid view, and shared zone theme in one package.
 
 > **Full GUI editor — no YAML required.**
 
@@ -11,13 +11,14 @@ A suite of bold, at-a-glance Lovelace cards for tracking people in Home Assistan
 [![Release](https://img.shields.io/github/v/release/squizzer73/lovelace-person-card)](https://github.com/squizzer73/lovelace-person-card/releases/latest)
 [![MIT License](https://img.shields.io/badge/licence-MIT-green.svg)](LICENSE)
 
-### Three cards, one package
+### Four cards, one package
 
 | Card | Element | Purpose |
 |------|---------|---------|
 | **Person Card** | `custom:person-card` | Single-person detail card — small, medium, large, hero, and stats layouts |
 | **Family Card** | `custom:family-card` | Whole-household overview with compact, mini, and detailed density modes |
-| **Theme Card** | `custom:person-card-theme` | Set zone colours once; every Person Card and Family Card on the dashboard inherits them automatically |
+| **Family Grid Card** | `custom:family-grid-card` | Animated grid of glowing avatar tiles — readable from across a room |
+| **Theme Card** | `custom:person-card-theme` | Set zone colours once; every card on the dashboard inherits them automatically |
 
 ---
 
@@ -308,6 +309,66 @@ density: detailed
 
 ---
 
+## Family Grid Card
+
+A bold presence-at-a-glance card: every family member rendered as a large glowing animated tile in a configurable grid. Designed to be readable from across a room.
+
+Each tile has a **breathing coloured ring** whose colour comes from your zone styles. People at home pulse slowly (calm); everyone else pulses faster (draws the eye to who's out). A colour-matched zone badge pill below the name tells you where they are.
+
+### Family Grid Card Features
+
+- **Animated ring tiles** — breathing glow ring (`box-shadow` pulse) plus an outward ripple on every avatar
+- **Ring colour from zone styles** — same zone style system as Family Card and Theme Card; falls back to a subtle white ring if no style is set
+- **Home vs. away speed** — home = 3 s breathe cycle; all other zones = 1.8 s (subtly faster to draw attention)
+- **Configurable columns** — 1–6 columns; tiles and ring sizes scale automatically
+- **Optional header** — set `title` to show a card header with a live "X home · Y away" summary
+- **Avatar or initials** — uses `entity_picture` from the person entity; falls back to the person's initial if no photo is set
+- **Shared zone colours** — inherits from the Theme Card; per-card `zone_styles` override if needed
+- **Full GUI editor** — Display · People · Zone Styles tabs
+
+### Family Grid Card Configuration
+
+```yaml
+type: custom:family-grid-card
+title: Family               # optional — shows header with home/away summary
+columns: 3                  # 1–6, default 3
+people:
+  - entity: person.mark
+  - entity: person.sarah
+    name: Sarah             # optional name override
+  - entity: person.james
+  - entity: person.lucy
+zone_styles:
+  - zone: home
+    label: Home
+    icon: mdi:home
+    border_color: "#76c442"
+  - zone: not_home
+    label: Away
+    icon: mdi:map-marker-off
+    border_color: "#ff6d00"
+```
+
+#### Family grid card options
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| `title` | string | — | Card header label. If omitted, no header is shown |
+| `columns` | number | `3` | Grid column count (1–6) |
+| `people` | list | — | List of person entities to display |
+| `zone_styles` | list | `[]` | Per-zone colour/icon overrides (falls back to Theme Card) |
+
+#### Per-person options (`people` list)
+
+| Key | Type | Description |
+|-----|------|-------------|
+| `entity` | string | `person.*` entity ID |
+| `name` | string | Override display name |
+
+> **Installation note:** `family-grid-card` is a separate JS file — add `dist/family-grid-card.js` as a second Lovelace resource alongside `person-card.js`. See [Installation](#installation) below.
+
+---
+
 ## Theme Card
 
 Configure zone colours once and every Person Card and Family Card on the dashboard inherits them automatically.
@@ -369,7 +430,7 @@ Place the Theme Card anywhere on the dashboard — all Person Cards and Family C
 
 ## GUI Editor — No YAML Required
 
-All three cards have a full visual editor. The card picker preview populates with real entities from your HA instance so you can see exactly what the card will look like before adding it.
+All four cards have a full visual editor. The card picker preview populates with real entities from your HA instance so you can see exactly what the card will look like before adding it.
 
 ### Person Card Editor
 
@@ -398,6 +459,14 @@ All three cards have a full visual editor. The card picker preview populates wit
 - **Conditions** — AND/OR rule builder
 - **Display** — group by zone, zone summary bar, show/hide devices, last seen, ETA, notification badge, offline threshold
 
+### Family Grid Card Editor
+
+Three tabs:
+
+- **Display** — card title and column count (1–6)
+- **People** — entity picker per person, optional name override; add/remove entries
+- **Zone Styles** — same zone colour/icon editor as Family Card; or leave empty to inherit from the Theme Card
+
 ### Theme Card Editor
 
 ![Theme card editor](docs/screenshots/editor-theme-card.png)
@@ -422,12 +491,14 @@ Or add manually:
 
 ### Manual
 
-1. Download `person-card.js` from the [latest release](https://github.com/squizzer73/lovelace-person-card/releases/latest)
-2. Copy to `/config/www/person-card.js`
-3. **Settings → Dashboards → Resources** → add `/local/person-card.js` (type: JavaScript module)
+1. Download `person-card.js` (and `family-grid-card.js` if you want the grid card) from the [latest release](https://github.com/squizzer73/lovelace-person-card/releases/latest)
+2. Copy to `/config/www/`
+3. **Settings → Dashboards → Resources** → add each file as a JavaScript module:
+   - `/local/person-card.js`
+   - `/local/family-grid-card.js` *(only needed for `custom:family-grid-card`)*
 4. Refresh the browser
 
-> All three cards (`custom:person-card`, `custom:family-card`, `custom:person-card-theme`) are registered from the single `person-card.js` file — no separate resource entries needed.
+> `custom:person-card`, `custom:family-card`, and `custom:person-card-theme` are all registered from `person-card.js`. The `custom:family-grid-card` is a separate file — add it as a second resource only if you use the grid card.
 
 ---
 
