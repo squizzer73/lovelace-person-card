@@ -7,7 +7,7 @@ import { familyGridStyles } from './family-grid-styles';
 import { resolveZoneStyles, THEME_EVENT } from './shared/theme-registry';
 import { resolveZoneStyle, getZoneLabel, getZoneIcon, hexToRgba } from './shared/zone-utils';
 import { getRingSize, getInitials, countSummary } from './shared/family-grid-utils';
-// import './family-grid-card-editor'; // added in Task 4
+import './family-grid-card-editor';
 
 declare global {
   interface Window {
