@@ -7,6 +7,22 @@ Versions follow [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [0.7.0] — 2026-04-28
+
+### Added
+
+- **Family Grid Card** (`family-grid-card`) — new standalone card displaying all family members as an animated grid of glowing avatar tiles:
+  - Each person gets a coloured ring whose colour comes from your zone styles (same system as `family-card` and Theme Card)
+  - Rings breathe slowly for people at home (3 s cycle) and pulse slightly faster for everyone else (1.8 s) — draws the eye to who's out
+  - Name + colour-matched zone badge pill below each avatar
+  - `columns` config (1–6, default 3) — tiles resize automatically to fill the card width
+  - Optional `title` shows a header with a live "X home · Y away" summary
+  - Falls back to initials when no `entity_picture` is set
+  - Full visual editor with Display, People, and Zone Styles tabs
+  - `dist/family-grid-card.js` — add as a separate Lovelace resource alongside `person-card.js` and `family-card.js`
+
+---
+
 ## [0.6.2] — 2026-04-17
 
 ### Changed
