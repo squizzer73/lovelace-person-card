@@ -1,8 +1,8 @@
 // src/family-grid-card.ts
 import { LitElement, html } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { customElement, property, state } from 'lit/decorators.js';
 import type { HomeAssistant } from 'custom-card-helpers';
-import type { FamilyGridCardConfig, FamilyPersonConfig } from './shared/types';
+import type { FamilyGridCardConfig, FamilyPersonConfig, ZoneStyleConfig } from './shared/types';
 import { familyGridStyles } from './family-grid-styles';
 import { resolveZoneStyles, THEME_EVENT } from './shared/theme-registry';
 import { resolveZoneStyle, getZoneLabel, getZoneIcon, hexToRgba } from './shared/zone-utils';
@@ -25,7 +25,7 @@ window.customCards.push({
 @customElement('family-grid-card')
 export class FamilyGridCard extends LitElement {
   @property({ attribute: false }) hass!: HomeAssistant;
-  private _config!: FamilyGridCardConfig;
+  @state() private _config!: FamilyGridCardConfig;
 
   static styles = familyGridStyles;
 
@@ -65,9 +65,8 @@ export class FamilyGridCard extends LitElement {
     return resolveZoneStyles(this._config.zone_styles ?? []);
   }
 
-  private _renderTile(person: FamilyPersonConfig) {
+  private _renderTile(person: FamilyPersonConfig, zoneStyles: ZoneStyleConfig[]) {
     const zone = this.hass.states[person.entity]?.state ?? 'unknown';
-    const zoneStyles = this._zoneStyles();
     const zoneStyle = resolveZoneStyle(zone, zoneStyles);
     const personState = this.hass.states[person.entity];
     const picture = personState?.attributes?.entity_picture as string | undefined;
@@ -121,6 +120,7 @@ export class FamilyGridCard extends LitElement {
     const avatarSize = ringSize - 12;
     const initialSize = Math.round(avatarSize * 0.35);
 
+    const zoneStyles = this._zoneStyles();
     const gridStyle = [
       `--fgc-cols:${cols}`,
       `--fgc-ring-size:${ringSize}px`,
@@ -140,7 +140,7 @@ export class FamilyGridCard extends LitElement {
           </div>
         ` : ''}
         <div class="person-grid" style=${gridStyle}>
-          ${people.map(p => this._renderTile(p))}
+          ${people.map(p => this._renderTile(p, zoneStyles))}
         </div>
       </div>
     `;
