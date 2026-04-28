@@ -121,3 +121,10 @@ export interface FamilyCardConfig {
   background_image?: string;
   card_theme?: CardTheme;
 }
+
+export interface FamilyGridCardConfig {
+  title?: string;                    // Optional header label. Omit to hide header entirely.
+  columns?: number;                  // Grid columns 1–6. Default: 3.
+  people?: FamilyPersonConfig[];     // People to display. Reuses existing type.
+  zone_styles?: ZoneStyleConfig[];   // Per-zone colour/icon/label overrides (falls back to Theme Card).
+}
